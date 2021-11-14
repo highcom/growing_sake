@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:growing_sake/sake_detail.dart';
 import 'package:growing_sake/sake_grid_view.dart';
+import 'package:growing_sake/firebase_google_auth.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const GrowingSakeApp());
 }
 
@@ -38,7 +42,7 @@ class _GrowingSakeWidgetState extends State<GrowingSakeWidget> {
   final _pageWidgets = [
     const SakeGridViewWidget(color:Colors.white, title:'Home'),
     const SakeGridViewWidget(color:Colors.blue, title:'Timeline'),
-    const SakeGridViewWidget(color:Colors.orange, title:'Menu'),
+    FirebaseGoogleAuth(),
   ];
 
   void _DetailSakeTransition() {
