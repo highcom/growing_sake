@@ -54,6 +54,7 @@ class SakeGridViewWidget extends StatelessWidget {
                   padding: const EdgeInsets.all(10.0),
                   decoration: BoxDecoration(
                     color: color,
+                    borderRadius: BorderRadius.circular(10),
                     boxShadow: const [
                       BoxShadow(
                         color: Colors.grey,
