@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:fl_chart/fl_chart.dart';
+import 'package:growing_sake/sake_line_chart.dart';
+import 'package:growing_sake/sake_radar_chart.dart';
+
+const gridColor = Color(0xff68739f);
+const titleColor = Color(0xff8c95db);
 
 class SakeDetailWidget extends StatelessWidget {
   SakeDetailWidget({Key? key}) : super(key: key);
@@ -48,13 +53,15 @@ class _SakeDetailState extends State<SakeDetail> {
   String _title = '';
   String _subTitle = '';
 
+  int selectedDataSetIndex = -1;
+
   void _handleVisible() {
     setState(() {
       if (_height > 0) {
         _height = 0;
         _iconData = Icons.add;
       } else {
-        _height = 225;
+        _height = 580;
         _iconData = Icons.remove;
       }
     });
@@ -186,14 +193,134 @@ class _SakeDetailState extends State<SakeDetail> {
                     decoration: TextFieldDecoration('内容量'),
                   ),
                 ),
-                Container(
-                  height: 45,
-                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                  child: TextField(
-                    enabled: true,
-                    maxLines:1 ,
-                    onChanged: _handleSubTitleText,
-                    decoration: TextFieldDecoration('五味'),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedDataSetIndex = -1;
+                          });
+                        },
+                        child: Text(
+                          'Categories'.toUpperCase(),
+                          style: const TextStyle(
+                            color: titleColor,
+                            fontSize: 32,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: SakeRadarChart().rawDataSets()
+                            .asMap()
+                            .map((index, value) {
+                          final isSelected = index == selectedDataSetIndex;
+                          return MapEntry(
+                            index,
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedDataSetIndex = index;
+                                });
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                margin: const EdgeInsets.symmetric(vertical: 2),
+                                height: 26,
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? gridColor.withOpacity(0.5)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(46),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 4.0, horizontal: 6),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    AnimatedContainer(
+                                      duration: const Duration(milliseconds: 400),
+                                      curve: Curves.easeInToLinear,
+                                      padding: EdgeInsets.all(isSelected ? 8 : 6),
+                                      decoration: BoxDecoration(
+                                        color: value.color,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    AnimatedDefaultTextStyle(
+                                      duration: const Duration(milliseconds: 300),
+                                      curve: Curves.easeInToLinear,
+                                      style: TextStyle(
+                                        color: isSelected ? value.color : gridColor,
+                                      ),
+                                      child: Text(value.title),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        })
+                            .values
+                            .toList(),
+                      ),
+                      AspectRatio(
+                        aspectRatio: 1.3,
+                        child: RadarChart(
+                          RadarChartData(
+                            radarTouchData: RadarTouchData(
+                                touchCallback: (FlTouchEvent event, response) {
+                                  if (!event.isInterestedForInteractions) {
+                                    setState(() {
+                                      selectedDataSetIndex = -1;
+                                    });
+                                    return;
+                                  }
+                                  setState(() {
+                                    selectedDataSetIndex =
+                                        response?.touchedSpot?.touchedDataSetIndex ?? -1;
+                                  });
+                                }),
+                            dataSets: SakeRadarChart().showingDataSets(selectedDataSetIndex),
+                            radarBackgroundColor: Colors.transparent,
+                            borderData: FlBorderData(show: false),
+                            radarBorderData: const BorderSide(color: Colors.transparent),
+                            titlePositionPercentageOffset: 0.2,
+                            titleTextStyle:
+                            const TextStyle(color: titleColor, fontSize: 14),
+                            getTitle: (index) {
+                              switch (index) {
+                                case 0:
+                                  return '甘味';
+                                case 1:
+                                  return '酸味';
+                                case 2:
+                                  return '辛味';
+                                case 3:
+                                  return '苦味';
+                                case 4:
+                                  return '渋味';
+                                default:
+                                  return '';
+                              }
+                            },
+                            tickCount: 1,
+                            ticksTextStyle:
+                            const TextStyle(color: Colors.transparent, fontSize: 10),
+                            tickBorderData: const BorderSide(color: Colors.transparent),
+                            gridBorderData: const BorderSide(color: gridColor, width: 2),
+                          ),
+                          swapAnimationDuration: const Duration(milliseconds: 400),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -221,40 +348,29 @@ class _SakeDetailState extends State<SakeDetail> {
           ),
           Container(
             padding: const EdgeInsets.all(8),
-            child: Column(
-              children: [
-                const Text('香りグラフ'),
-                SizedBox(
-                  height: 250,
-                  child: charts.TimeSeriesChart(
-                    _createAromaData(aromaList),
+            child: Stack(
+              children: <Widget>[
+                AspectRatio(
+                  aspectRatio: 1.70,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(18),
+                        ),
+                        color: Color(0xff232d37)),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          right: 18.0, left: 12.0, top: 24, bottom: 12),
+                      child: LineChart(SakeLineChart().mainData()),
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
+          )
         ],
       ),
     );
-  }
-
-  final aromaList = <AromaData>[
-    AromaData(DateTime(2020, 10, 2), 50),
-    AromaData(DateTime(2020, 10, 3), 53),
-    AromaData(DateTime(2020, 10, 4), 40)
-  ];
-
-  List<charts.Series<AromaData, DateTime>> _createAromaData(
-      List<AromaData> aromaList) {
-    return [
-      charts.Series<AromaData, DateTime>(
-        id: 'Muscles',
-        data: aromaList,
-        colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
-        domainFn: (AromaData aromaData, _) => aromaData.date,
-        measureFn: (AromaData aromaData, _) => aromaData.level,
-      )
-    ];
   }
 }
 
@@ -269,11 +385,4 @@ class TextFieldDecoration extends InputDecoration {
       borderSide: BorderSide.none,
     ),
   );
-}
-
-class AromaData {
-  final DateTime date;
-  final double level;
-
-  AromaData(this.date, this.level);
 }
