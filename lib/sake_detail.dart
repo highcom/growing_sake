@@ -34,10 +34,10 @@ class SakeDetail extends StatefulWidget {
 // 基本
 //  銘柄名
 //  サブ銘柄名
-//  酒舗
-//  産地
 //  画像
 // 詳細
+//  酒舗
+//  産地
 //  特定名称
 //  精米歩合
 //  原材料
@@ -52,6 +52,14 @@ class _SakeDetailState extends State<SakeDetail> {
   IconData _iconData = Icons.add;
   String _title = '';
   String _subTitle = '';
+  String _brewery = '';
+  String _area = '';
+  String _specific = '';
+  String _polishing = '';
+  String _material = '';
+  String _capacity = '';
+  String _temperture = '';
+  String _drinking = '';
 
   int selectedDataSetIndex = -1;
 
@@ -61,21 +69,9 @@ class _SakeDetailState extends State<SakeDetail> {
         _height = 0;
         _iconData = Icons.add;
       } else {
-        _height = 580;
+        _height = 617;
         _iconData = Icons.remove;
       }
-    });
-  }
-
-  void _handleTitleText(String e) {
-    setState(() {
-      _title = e;
-    });
-  }
-
-  void _handleSubTitleText(String e) {
-    setState(() {
-      _title = e;
     });
   }
 
@@ -90,7 +86,7 @@ class _SakeDetailState extends State<SakeDetail> {
             child: TextField(
               enabled: true,
               maxLines:1 ,
-              onChanged: _handleTitleText,
+              onChanged: (value) {setState(() {_title = value;});},
               decoration: TextFieldDecoration('銘柄名'),
             ),
           ),
@@ -100,28 +96,8 @@ class _SakeDetailState extends State<SakeDetail> {
             child: TextField(
               enabled: true,
               maxLines:1 ,
-              onChanged: _handleSubTitleText,
+              onChanged: (value) {setState(() {_subTitle = value;});},
               decoration: TextFieldDecoration('サブ銘柄名'),
-            ),
-          ),
-          Container(
-            height: 45,
-            padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-            child: TextField(
-              enabled: true,
-              maxLines:1 ,
-              onChanged: _handleSubTitleText,
-              decoration: TextFieldDecoration('酒舗'),
-            ),
-          ),
-          Container(
-            height: 45,
-            padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-            child: TextField(
-              enabled: true,
-              maxLines:1 ,
-              onChanged: _handleSubTitleText,
-              decoration: TextFieldDecoration('産地(県名)'),
             ),
           ),
           Container(
@@ -159,7 +135,27 @@ class _SakeDetailState extends State<SakeDetail> {
                   child: TextField(
                     enabled: true,
                     maxLines:1 ,
-                    onChanged: _handleSubTitleText,
+                    onChanged: (value) {setState(() {_brewery = value;});},
+                    decoration: TextFieldDecoration('酒舗'),
+                  ),
+                ),
+                Container(
+                  height: 45,
+                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                  child: TextField(
+                    enabled: true,
+                    maxLines:1 ,
+                    onChanged: (value) {setState(() {_area = value;});},
+                    decoration: TextFieldDecoration('産地(県名)'),
+                  ),
+                ),
+                Container(
+                  height: 45,
+                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                  child: TextField(
+                    enabled: true,
+                    maxLines:1 ,
+                    onChanged: (value) {setState(() {_specific = value;});},
                     decoration: TextFieldDecoration('特定名称'),
                   ),
                 ),
@@ -169,7 +165,7 @@ class _SakeDetailState extends State<SakeDetail> {
                   child: TextField(
                     enabled: true,
                     maxLines:1 ,
-                    onChanged: _handleSubTitleText,
+                    onChanged: (value) {setState(() {_polishing = value;});},
                     decoration: TextFieldDecoration('精米歩合'),
                   ),
                 ),
@@ -179,7 +175,7 @@ class _SakeDetailState extends State<SakeDetail> {
                   child: TextField(
                     enabled: true,
                     maxLines:1 ,
-                    onChanged: _handleSubTitleText,
+                    onChanged: (value) {setState(() {_material = value;});},
                     decoration: TextFieldDecoration('原材料'),
                   ),
                 ),
@@ -189,7 +185,7 @@ class _SakeDetailState extends State<SakeDetail> {
                   child: TextField(
                     enabled: true,
                     maxLines:1 ,
-                    onChanged: _handleSubTitleText,
+                    onChanged: (value) {setState(() {_capacity = value;});},
                     decoration: TextFieldDecoration('内容量'),
                   ),
                 ),
@@ -332,7 +328,7 @@ class _SakeDetailState extends State<SakeDetail> {
             child: TextField(
               enabled: true,
               maxLines:1 ,
-              onChanged: _handleSubTitleText,
+              onChanged: (value) {setState(() {_temperture = value;});},
               decoration: TextFieldDecoration('保管温度'),
             ),
           ),
@@ -342,7 +338,7 @@ class _SakeDetailState extends State<SakeDetail> {
             child: TextField(
               enabled: true,
               maxLines:1 ,
-              onChanged: _handleSubTitleText,
+              onChanged: (value) {setState(() {_drinking = value;});},
               decoration: TextFieldDecoration('飲み方'),
             ),
           ),
