@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/services.dart';
 import 'package:growing_sake/sake_line_chart.dart';
 import 'package:growing_sake/sake_radar_chart.dart';
 
@@ -48,6 +49,45 @@ class SakeDetail extends StatefulWidget {
 //  飲み方
 //  香りグラフ
 class _SakeDetailState extends State<SakeDetail> {
+  List<String> breweryList = [
+    '酒蔵名',
+    '田中酒造',
+    '遠藤酒造',
+    '佐藤酒造',
+  ];
+
+  List<String> areaList = [
+    '県名',
+    '北海道',
+    '青森県',
+    '秋田県',
+  ];
+
+  List<String> specificList = [
+    '名称',
+    '吟醸酒',
+    '大吟醸酒',
+    '純米酒',
+    '純米吟醸酒',
+    '純米大吟醸酒',
+    '特別純米酒',
+    '本醸造酒',
+    '特別本醸造酒',
+  ];
+
+  List<String> drinkingList = [
+    '雪冷え(5℃)',
+    '花冷え(10℃)',
+    '涼冷え(15℃)',
+    '冷や(20℃)',
+    '日向燗(30℃)',
+    '人肌燗(35℃)',
+    'ぬる燗(40℃)',
+    '上燗(45℃)',
+    '熱燗(50℃)',
+    '飛び切り燗(55℃)',
+  ];
+
   double _height = 0;
   IconData _iconData = Icons.add;
   String _title = '';
@@ -58,10 +98,26 @@ class _SakeDetailState extends State<SakeDetail> {
   String _polishing = '';
   String _material = '';
   String _capacity = '';
+  String _purchase = '';
   String _temperture = '';
   String _drinking = '';
 
   int selectedDataSetIndex = -1;
+
+  @override
+  void initState() {
+    setFilters();
+    super.initState();
+  }
+
+  setFilters() {
+    setState(() {
+      _brewery = breweryList[0];
+      _area = areaList[0];
+      _specific = specificList[0];
+      _drinking = drinkingList[3];
+    });
+  }
 
   void _handleVisible() {
     setState(() {
@@ -69,7 +125,7 @@ class _SakeDetailState extends State<SakeDetail> {
         _height = 0;
         _iconData = Icons.add;
       } else {
-        _height = 617;
+        _height = 759;
         _iconData = Icons.remove;
       }
     });
@@ -129,66 +185,6 @@ class _SakeDetailState extends State<SakeDetail> {
             duration: const Duration(milliseconds: 1000),
             child: Column(
               children: [
-                Container(
-                  height: 45,
-                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                  child: TextField(
-                    enabled: true,
-                    maxLines:1 ,
-                    onChanged: (value) {setState(() {_brewery = value;});},
-                    decoration: TextFieldDecoration('酒舗'),
-                  ),
-                ),
-                Container(
-                  height: 45,
-                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                  child: TextField(
-                    enabled: true,
-                    maxLines:1 ,
-                    onChanged: (value) {setState(() {_area = value;});},
-                    decoration: TextFieldDecoration('産地(県名)'),
-                  ),
-                ),
-                Container(
-                  height: 45,
-                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                  child: TextField(
-                    enabled: true,
-                    maxLines:1 ,
-                    onChanged: (value) {setState(() {_specific = value;});},
-                    decoration: TextFieldDecoration('特定名称'),
-                  ),
-                ),
-                Container(
-                  height: 45,
-                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                  child: TextField(
-                    enabled: true,
-                    maxLines:1 ,
-                    onChanged: (value) {setState(() {_polishing = value;});},
-                    decoration: TextFieldDecoration('精米歩合'),
-                  ),
-                ),
-                Container(
-                  height: 45,
-                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                  child: TextField(
-                    enabled: true,
-                    maxLines:1 ,
-                    onChanged: (value) {setState(() {_material = value;});},
-                    decoration: TextFieldDecoration('原材料'),
-                  ),
-                ),
-                Container(
-                  height: 45,
-                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                  child: TextField(
-                    enabled: true,
-                    maxLines:1 ,
-                    onChanged: (value) {setState(() {_capacity = value;});},
-                    decoration: TextFieldDecoration('内容量'),
-                  ),
-                ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -319,27 +315,134 @@ class _SakeDetailState extends State<SakeDetail> {
                     ],
                   ),
                 ),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                  child: DropdownButtonFormField<String>(
+                    decoration: TextFieldDecoration('酒舗'),
+                    value: _brewery,
+                    onChanged: (v) {
+                      setState(() {
+                        _brewery = v!;
+                      });
+                    },
+                    items: breweryList
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                  child: DropdownButtonFormField<String>(
+                    decoration: TextFieldDecoration('産地'),
+                    value: _area,
+                    onChanged: (v) {
+                      setState(() {
+                        _area = v!;
+                      });
+                    },
+                    items: areaList
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                  child: DropdownButtonFormField<String>(
+                    decoration: TextFieldDecoration('特定名称'),
+                    value: _specific,
+                    onChanged: (v) {
+                      setState(() {
+                        _specific = v!;
+                      });
+                    },
+                    items: specificList
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                  child: TextField(
+                    enabled: true,
+                    maxLines:1 ,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    onChanged: (value) {setState(() {_polishing = value;});},
+                    decoration: TextFieldWithSuffixDecoration('精米歩合', '％'),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                  child: TextField(
+                    enabled: true,
+                    maxLines:1 ,
+                    onChanged: (value) {setState(() {_material = value;});},
+                    decoration: TextFieldDecoration('原材料'),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                  child: TextField(
+                    enabled: true,
+                    maxLines:1 ,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    onChanged: (value) {setState(() {_capacity = value;});},
+                    decoration: TextFieldWithSuffixDecoration('内容量', 'ml'),
+                  ),
+                ),
               ],
             )
           ),
           Container(
-            height: 45,
             padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
             child: TextField(
               enabled: true,
               maxLines:1 ,
-              onChanged: (value) {setState(() {_temperture = value;});},
-              decoration: TextFieldDecoration('保管温度'),
+              onChanged: (value) {setState(() {_purchase = value;});},
+              decoration: TextFieldDecoration('購入日'),
             ),
           ),
           Container(
-            height: 45,
             padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
             child: TextField(
               enabled: true,
               maxLines:1 ,
-              onChanged: (value) {setState(() {_drinking = value;});},
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              onChanged: (value) {setState(() {_temperture = value;});},
+              decoration: TextFieldWithSuffixDecoration('保管温度', '度'),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+            child: DropdownButtonFormField<String>(
               decoration: TextFieldDecoration('飲み方'),
+              value: _drinking,
+              onChanged: (v) {
+                setState(() {
+                  _drinking = v!;
+                });
+              },
+              items: drinkingList
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
             ),
           ),
           Container(
@@ -373,6 +476,20 @@ class _SakeDetailState extends State<SakeDetail> {
 class TextFieldDecoration extends InputDecoration {
   TextFieldDecoration(String text) : super(
     labelText: text,
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+    filled: true,
+    fillColor: Colors.blue.shade100,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: BorderSide.none,
+    ),
+  );
+}
+
+class TextFieldWithSuffixDecoration extends InputDecoration {
+  TextFieldWithSuffixDecoration(String text, String suffix) : super(
+    labelText: text,
+    suffixText: suffix,
     floatingLabelBehavior: FloatingLabelBehavior.auto,
     filled: true,
     fillColor: Colors.blue.shade100,
