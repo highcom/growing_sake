@@ -35,7 +35,7 @@ class SakeGridViewWidget extends StatelessWidget {
               return Container(
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.of(context).pushNamed('/sake_detail');
+                    Navigator.of(context).pushNamed('/sake_detail', arguments: snapshot.data!.docs[index].id);
                   },
                   child: Column(
                     children: <Widget>[
