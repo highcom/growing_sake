@@ -24,6 +24,8 @@ class CandidateList extends StatefulWidget {
   State<CandidateList> createState() => _CandidateListState();
 }
 class _CandidateListState extends State<CandidateList> {
+  String _name = '';
+
   Future<List<Brand>> fetchBrands() async {
     final response = await http.get(Uri.parse('https://muro.sakenowa.com/sakenowa-data/api/brands'));
     if (response.statusCode == 200) {
@@ -46,21 +48,50 @@ class _CandidateListState extends State<CandidateList> {
         title: const Text('Sake Detail'),
         automaticallyImplyLeading: true,
       ),
-      body: FutureBuilder<List<Brand>> (
-        future: fetchBrands(),
-        builder: (BuildContext context, AsyncSnapshot<List<Brand>> snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else {
-            return ListView.builder(
-              itemBuilder: (BuildContext context, int index) {
-                return _candidateItem(snapshot.data![index].name);
+      body: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            child: TextField(
+              enabled: true,
+              maxLines: 1,
+              onChanged: (value) {
+                setState(() {
+                  _name = value;
+                });
               },
-            );
-          }
-        },
+              decoration: InputDecoration(
+                labelText: '名称',
+                floatingLabelBehavior: FloatingLabelBehavior.auto,
+                filled: true,
+                fillColor: Colors.blue.shade100,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+
+              ),
+            ),
+          ),
+          Flexible(child:
+            FutureBuilder<List<Brand>> (
+              future: fetchBrands(),
+              builder: (BuildContext context, AsyncSnapshot<List<Brand>> snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else {
+                  return ListView.builder(
+                    itemBuilder: (BuildContext context, int index) {
+                      return _candidateItem(snapshot.data![index].name);
+                    },
+                  );
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
