@@ -4,12 +4,13 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/services.dart';
 import 'package:growing_sake/sake_line_chart.dart';
 import 'package:growing_sake/sake_radar_chart.dart';
+import 'package:growing_sake/candidate_list.dart';
 
 const gridColor = Color(0xff68739f);
 const titleColor = Color(0xff8c95db);
 
 class SakeDetailWidget extends StatelessWidget {
-  SakeDetailWidget({Key? key}) : super(key: key);
+  const SakeDetailWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +134,11 @@ class _SakeDetailState extends State<SakeDetail> {
 
   @override
   Widget build(BuildContext context) {
-    args = ModalRoute.of(context)!.settings.arguments as String;
+    if (ModalRoute.of(context)!.settings.arguments != null) {
+      args = ModalRoute.of(context)!.settings.arguments as String;
+    } else {
+      args = '9s7xq5AmBX6jXKRRICK8';
+    }
     return StreamBuilder<DocumentSnapshot>(
       stream: FirebaseFirestore.instance.collection('BrandList').doc(args).snapshots(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
@@ -194,6 +199,15 @@ class _SakeDetailState extends State<SakeDetail> {
                     controller: titleController,
                     enabled: true,
                     maxLines: 1,
+                    onTap: () {
+                      final FocusScopeNode currentScope = FocusScope.of(context);
+                      if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
+                        FocusManager.instance.primaryFocus!.unfocus();
+                      } else {
+                        Navigator.of(context).pushNamed("/candidate_list");
+                        print('Focus is enabled!');
+                      }
+                    },
                     onChanged: (value) {
                       setState(() {
                         _title = value;

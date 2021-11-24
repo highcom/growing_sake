@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:growing_sake/candidate_list.dart';
 import 'package:growing_sake/sake_detail.dart';
 import 'package:growing_sake/sake_grid_view.dart';
 import 'package:growing_sake/firebase_google_auth.dart';
@@ -22,7 +23,8 @@ class GrowingSakeApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       routes: <String, WidgetBuilder> {
-        '/sake_detail': (BuildContext context) => SakeDetailWidget()
+        '/sake_detail': (BuildContext context) => const SakeDetailWidget(),
+        '/candidate_list': (BuildContext context) => const CandidateListWidget(),
       },
       home: const GrowingSakeWidget(title: 'Growing Sake App'),
     );
