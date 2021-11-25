@@ -24,10 +24,10 @@ class CandidateList extends StatefulWidget {
   State<CandidateList> createState() => _CandidateListState();
 }
 class _CandidateListState extends State<CandidateList> {
-  String _name = '';
+  final TextEditingController _nameController = TextEditingController();
 
   Future<List<Brand>> fetchBrands() async {
-    final response = await http.get(Uri.parse('https://muro.sakenowa.com/sakenowa-data/api/brands'));
+    final response = await http.get(Uri.parse('https://muro.sakenowa.com/sakenowa-data/api/brands')).timeout(const Duration(seconds: 5));
     if (response.statusCode == 200) {
       List<Brand> brands = [];
       Map<String, dynamic> decodeJson = json.decode(response.body);
@@ -55,9 +55,10 @@ class _CandidateListState extends State<CandidateList> {
             child: TextField(
               enabled: true,
               maxLines: 1,
+              controller: _nameController,
               onChanged: (value) {
                 setState(() {
-                  _name = value;
+                  _nameController.text = value;
                 });
               },
               decoration: InputDecoration(
@@ -86,6 +87,7 @@ class _CandidateListState extends State<CandidateList> {
                     itemBuilder: (BuildContext context, int index) {
                       return _candidateItem(snapshot.data![index].name);
                     },
+                    itemCount: snapshot.data!.length,
                   );
                 }
               },
@@ -110,7 +112,7 @@ class _CandidateListState extends State<CandidateList> {
           ),
         ),
         onTap: () {
-          print("onTap called.");
+          _nameController.text = title;
         }, // タップ
       ),
     );
