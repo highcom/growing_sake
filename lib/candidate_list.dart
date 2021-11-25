@@ -23,7 +23,10 @@ class CandidateList extends StatefulWidget {
   @override
   State<CandidateList> createState() => _CandidateListState();
 }
+
 class _CandidateListState extends State<CandidateList> {
+  List<Brand> allBrands = [];
+  List<Brand> searchBrands = [];
   final TextEditingController _nameController = TextEditingController();
 
   Future<List<Brand>> fetchBrands() async {
@@ -39,6 +42,22 @@ class _CandidateListState extends State<CandidateList> {
     } else {
       throw Exception('Failed to load brand');
     }
+  }
+
+  void _runFilter(String enteredKeyword) {
+    List<Brand> results = [];
+    if (enteredKeyword.isEmpty) {
+      results = allBrands;
+    } else {
+      results = allBrands
+          .where((list) =>
+          list.name.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+    }
+
+    // Refresh the UI
+    setState(() {
+      searchBrands = results;
+    });
   }
 
   @override
@@ -57,9 +76,7 @@ class _CandidateListState extends State<CandidateList> {
               maxLines: 1,
               controller: _nameController,
               onChanged: (value) {
-                setState(() {
-                  _nameController.text = value;
-                });
+                _runFilter(value);
               },
               decoration: InputDecoration(
                 labelText: '名称',
@@ -83,11 +100,12 @@ class _CandidateListState extends State<CandidateList> {
                     child: CircularProgressIndicator(),
                   );
                 } else {
+                  allBrands = snapshot.data!;
                   return ListView.builder(
                     itemBuilder: (BuildContext context, int index) {
-                      return _candidateItem(snapshot.data![index].name);
+                      return _candidateItem(searchBrands[index].name);
                     },
-                    itemCount: snapshot.data!.length,
+                    itemCount: searchBrands.length,
                   );
                 }
               },
