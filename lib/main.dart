@@ -22,9 +22,15 @@ class GrowingSakeApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      routes: <String, WidgetBuilder> {
-        '/sake_detail': (BuildContext context) => const SakeDetailWidget(),
-        '/candidate_list': (BuildContext context) => const CandidateListWidget(),
+      onGenerateRoute: (RouteSettings settings) {
+        var routes = <String, WidgetBuilder>{
+          '/sake_detail': (BuildContext context) => const SakeDetailWidget(),
+          '/candidate_list': (BuildContext context) => CandidateListWidget(arguments: settings.arguments),
+        };
+
+        WidgetBuilder builder = routes[settings.name] ?? routes['/sake_detail']!;
+
+        return MaterialPageRoute(builder: (ctx) => builder(ctx));
       },
       home: const GrowingSakeWidget(title: 'Growing Sake App'),
     );

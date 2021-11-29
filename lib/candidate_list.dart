@@ -6,28 +6,20 @@ import 'package:json_annotation/json_annotation.dart';
 import 'dart:convert' show json;
 @JsonSerializable()
 
-class CandidateListWidget extends StatelessWidget {
-  const CandidateListWidget({Key? key}) : super(key: key);
+class CandidateListWidget extends StatefulWidget {
+  final arguments;
+  const CandidateListWidget({Key? key, required this.arguments}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: CandidateList(),
-    );
-  }
+  State<CandidateListWidget> createState() => _CandidateListState();
 }
 
-class CandidateList extends StatefulWidget {
-  const CandidateList({Key? key}) : super(key: key);
-
-  @override
-  State<CandidateList> createState() => _CandidateListState();
-}
-
-class _CandidateListState extends State<CandidateList> {
+class _CandidateListState extends State<CandidateListWidget> {
+  List<String> _defaultParams = [];
   List<Brand> allBrands = [];
   List<Brand> searchBrands = [];
-  final TextEditingController _nameController = TextEditingController();
+  String? _title = '';
+  final TextEditingController? _nameController = TextEditingController();
 
   Future<List<Brand>> fetchBrands() async {
     final response = await http.get(Uri.parse('https://muro.sakenowa.com/sakenowa-data/api/brands')).timeout(const Duration(seconds: 5));
@@ -61,11 +53,22 @@ class _CandidateListState extends State<CandidateList> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _defaultParams = widget.arguments;
+    _title = _defaultParams[0];
+    _nameController!.text = _defaultParams[1];
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sake Detail'),
         automaticallyImplyLeading: true,
+        actions: [
+          IconButton(onPressed: () {Navigator.of(context).pop(_nameController!.text);}, icon: const Icon(Icons.check)),
+        ],
       ),
       body: Column(
         children: [
@@ -77,9 +80,12 @@ class _CandidateListState extends State<CandidateList> {
               controller: _nameController,
               onChanged: (value) {
                 _runFilter(value);
+                setState(() {
+                  _nameController!.text = value;
+                });
               },
               decoration: InputDecoration(
-                labelText: '名称',
+                labelText: _title,
                 floatingLabelBehavior: FloatingLabelBehavior.auto,
                 filled: true,
                 fillColor: Colors.blue.shade100,
@@ -130,7 +136,7 @@ class _CandidateListState extends State<CandidateList> {
           ),
         ),
         onTap: () {
-          _nameController.text = title;
+          _nameController!.text = title;
         }, // タップ
       ),
     );

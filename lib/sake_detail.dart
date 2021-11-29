@@ -9,22 +9,11 @@ import 'package:growing_sake/candidate_list.dart';
 const gridColor = Color(0xff68739f);
 const titleColor = Color(0xff8c95db);
 
-class SakeDetailWidget extends StatelessWidget {
+class SakeDetailWidget extends StatefulWidget {
   const SakeDetailWidget({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return const Center(
-        child: SakeDetail(),
-    );
-  }
-}
-
-class SakeDetail extends StatefulWidget {
-  const SakeDetail({Key? key}) : super(key: key);
-
-  @override
-  State<SakeDetail> createState() => _SakeDetailState();
+  State<SakeDetailWidget> createState() => _SakeDetailState();
 }
 
 // 基本
@@ -43,7 +32,7 @@ class SakeDetail extends StatefulWidget {
 //  保管温度
 //  飲み方
 //  香りグラフ
-class _SakeDetailState extends State<SakeDetail> {
+class _SakeDetailState extends State<SakeDetailWidget> {
   List<String> breweryList = [
     '酒蔵名',
     '田中酒造',
@@ -87,7 +76,6 @@ class _SakeDetailState extends State<SakeDetail> {
 
   double _height = 0;
   IconData _iconData = Icons.add;
-  String _title = '';
   String _subTitle = '';
   String _brewery = '';
   String _area = '';
@@ -100,7 +88,7 @@ class _SakeDetailState extends State<SakeDetail> {
   String _drinking = '';
 
   // TODO:他の入力項目も定義する
-  final TextEditingController titleController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
   final TextEditingController subTitleController = TextEditingController();
 
   int selectedDataSetIndex = -1;
@@ -147,9 +135,8 @@ class _SakeDetailState extends State<SakeDetail> {
             child: CircularProgressIndicator(),
           );
         }
-        _title = snapshot.data!.get('title');
         // TODO:他の入力項目も設定する
-        titleController.text = _title;
+        _titleController.text = snapshot.data!.get('title');
         _subTitle = snapshot.data!.get('subtitle');
         subTitleController.text = _subTitle;
         // TODO:一覧と合わないデータが入るとエラーになるので一旦コメントアウト
@@ -173,7 +160,7 @@ class _SakeDetailState extends State<SakeDetail> {
                   await FirebaseFirestore.instance.collection('BrandList')
                       .doc()
                       .set({
-                    'title': _title,
+                    'title': _titleController.text,
                     'subtitle': _subTitle,
                     'brewery': _brewery,
                     'area': _area,
@@ -196,7 +183,7 @@ class _SakeDetailState extends State<SakeDetail> {
                 Container(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                   child: TextField(
-                    controller: titleController,
+                    controller: _titleController,
                     enabled: true,
                     maxLines: 1,
                     onTap: () {
@@ -204,13 +191,18 @@ class _SakeDetailState extends State<SakeDetail> {
                       if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
                         FocusManager.instance.primaryFocus!.unfocus();
                       } else {
-                        Navigator.of(context).pushNamed("/candidate_list");
+                        List<String> params = ['銘柄名', _titleController.text];
+                        Navigator.of(context).pushNamed("/candidate_list", arguments: params).then((value) {
+                          if (value != null) {
+                            _titleController.text = value as String;
+                          }
+                        });
                         print('Focus is enabled!');
                       }
                     },
                     onChanged: (value) {
                       setState(() {
-                        _title = value;
+                        _titleController.text = value;
                       });
                     },
                     decoration: TextFieldDecoration('銘柄名'),
