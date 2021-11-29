@@ -80,9 +80,6 @@ class _CandidateListState extends State<CandidateListWidget> {
               controller: _nameController,
               onChanged: (value) {
                 _runFilter(value);
-                setState(() {
-                  _nameController!.text = value;
-                });
               },
               decoration: InputDecoration(
                 labelText: _title,
@@ -137,6 +134,7 @@ class _CandidateListState extends State<CandidateListWidget> {
         ),
         onTap: () {
           _nameController!.text = title;
+          _nameController!.selection = TextSelection.fromPosition(TextPosition(offset: _nameController!.text.length));
         }, // タップ
       ),
     );
