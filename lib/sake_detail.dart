@@ -76,7 +76,6 @@ class _SakeDetailState extends State<SakeDetailWidget> {
 
   double _height = 0;
   IconData _iconData = Icons.add;
-  String _subTitle = '';
   String _brewery = '';
   String _area = '';
   String _specific = '';
@@ -89,7 +88,7 @@ class _SakeDetailState extends State<SakeDetailWidget> {
 
   // TODO:他の入力項目も定義する
   final TextEditingController _titleController = TextEditingController();
-  final TextEditingController subTitleController = TextEditingController();
+  final TextEditingController _subTitleController = TextEditingController();
 
   int selectedDataSetIndex = -1;
 
@@ -120,6 +119,24 @@ class _SakeDetailState extends State<SakeDetailWidget> {
     });
   }
 
+  Future<DocumentSnapshot> getBrandData() async {
+    Future<DocumentSnapshot> future = FirebaseFirestore.instance.collection('BrandList').doc(args).get();
+    DocumentSnapshot snapshot = await future;
+    _titleController.text = snapshot.get('title');
+    _subTitleController.text = snapshot.get('subtitle');
+    // TODO:一覧と合わないデータが入るとエラーになるので一旦コメントアウト
+    // _brewery = snapshot.get('brewery');
+    // _area = snapshot.get('area');
+    _specific = snapshot.get('specific');
+    _polishing = snapshot.get('polishingRate').toString();
+    _material = snapshot.get('rawMaterial');
+    _capacity = snapshot.get('capacity').toString();
+    // _purchase = snapshot.get('purchase');
+    _temperature = snapshot.get('storageTemperature').toString();
+    // _drinking = snapshot.get('howToDrink');
+    return future;
+  }
+
   @override
   Widget build(BuildContext context) {
     if (ModalRoute.of(context)!.settings.arguments != null) {
@@ -127,28 +144,15 @@ class _SakeDetailState extends State<SakeDetailWidget> {
     } else {
       args = '9s7xq5AmBX6jXKRRICK8';
     }
-    return StreamBuilder<DocumentSnapshot>(
-      stream: FirebaseFirestore.instance.collection('BrandList').doc(args).snapshots(),
+    return FutureBuilder<DocumentSnapshot>(
+      future: getBrandData(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (!snapshot.hasData) {
           return const Center(
             child: CircularProgressIndicator(),
           );
         }
-        // TODO:他の入力項目も設定する
-        _titleController.text = snapshot.data!.get('title');
-        _subTitle = snapshot.data!.get('subtitle');
-        subTitleController.text = _subTitle;
-        // TODO:一覧と合わないデータが入るとエラーになるので一旦コメントアウト
-        // _brewery = snapshot.data!.get('brewery');
-        // _area = snapshot.data!.get('area');
-        _specific = snapshot.data!.get('specific');
-        _polishing = snapshot.data!.get('polishingRate').toString();
-        _material = snapshot.data!.get('rawMaterial');
-        _capacity = snapshot.data!.get('capacity').toString();
-        // _purchase = snapshot.data!.get('purchase');
-        _temperature = snapshot.data!.get('storageTemperature').toString();
-        // _drinking = snapshot.data!.get('howToDrink');
+
         return Scaffold(
           appBar: AppBar(
             title: const Text('Sake Detail'),
@@ -161,7 +165,7 @@ class _SakeDetailState extends State<SakeDetailWidget> {
                       .doc()
                       .set({
                     'title': _titleController.text,
-                    'subtitle': _subTitle,
+                    'subtitle': _subTitleController.text,
                     'brewery': _brewery,
                     'area': _area,
                     'specific': _specific,
@@ -197,13 +201,7 @@ class _SakeDetailState extends State<SakeDetailWidget> {
                             _titleController.text = value as String;
                           }
                         });
-                        print('Focus is enabled!');
                       }
-                    },
-                    onChanged: (value) {
-                      setState(() {
-                        _titleController.text = value;
-                      });
                     },
                     decoration: TextFieldDecoration('銘柄名'),
                   ),
@@ -215,9 +213,7 @@ class _SakeDetailState extends State<SakeDetailWidget> {
                     enabled: true,
                     maxLines: 1,
                     onChanged: (value) {
-                      setState(() {
-                        _subTitle = value;
-                      });
+                      _subTitleController.text = value;
                     },
                     decoration: TextFieldDecoration('サブ銘柄名'),
                   ),
