@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:growing_sake/brand.dart';
+import 'package:growing_sake/brewery.dart';
+import 'package:growing_sake/area.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'dart:convert' show json;
 @JsonSerializable()
@@ -18,22 +20,41 @@ class _CandidateListState extends State<CandidateListWidget> {
   List<String> _defaultParams = [];
   List<Brand> allBrands = [];
   List<Brand> searchBrands = [];
+  List<Brewery> breweries = [];
+  List<Area> areas = [];
   String? _title = '';
   final TextEditingController? _nameController = TextEditingController();
 
+  Map<String, String> result = {};
+
   Future<List<Brand>> fetchBrands() async {
-    final response = await http.get(Uri.parse('https://muro.sakenowa.com/sakenowa-data/api/brands')).timeout(const Duration(seconds: 5));
-    if (response.statusCode == 200) {
-      List<Brand> brands = [];
-      Map<String, dynamic> decodeJson = json.decode(response.body);
-      List<dynamic> brandList = decodeJson['brands'];
-      brandList.forEach((element) {
-        brands.add(Brand.fromJson(element));
-      });
-      return brands;
-    } else {
-      throw Exception('Failed to load brand');
+    List<Brand> brands = [];
+
+    final brandUrl = http.get(Uri.parse('https://muro.sakenowa.com/sakenowa-data/api/brands')).timeout(const Duration(seconds: 5));
+    final breweryUrl = http.get(Uri.parse('https://muro.sakenowa.com/sakenowa-data/api/breweries')).timeout(const Duration(seconds: 5));
+    final areaUrl = http.get(Uri.parse('https://muro.sakenowa.com/sakenowa-data/api/areas')).timeout(const Duration(seconds: 5));
+    final futureWait = Future.wait([brandUrl, breweryUrl, areaUrl]);
+    final response = await futureWait;
+
+    for (final data in response) {
+      if (data.statusCode == 200) {
+        Map<String, dynamic> decodeJson = json.decode(data.body);
+        if (decodeJson['brands'] != null) {
+          List<dynamic> list = decodeJson['brands'];
+          for (var element in list) {brands.add(Brand.fromJson(element));}
+        } else if (decodeJson['breweries'] != null) {
+          List<dynamic> list = decodeJson['breweries'];
+          for (var element in list) {breweries.add(Brewery.fromJson(element));}
+        } else if (decodeJson['areas'] != null) {
+          List<dynamic> list = decodeJson['areas'];
+          for (var element in list) {areas.add(Area.fromJson(element));}
+        }
+      } else {
+        throw Exception('Failed to load brand');
+      }
     }
+
+    return brands;
   }
 
   void _runFilter(String enteredKeyword) {
@@ -67,7 +88,7 @@ class _CandidateListState extends State<CandidateListWidget> {
         title: const Text('Sake Detail'),
         automaticallyImplyLeading: true,
         actions: [
-          IconButton(onPressed: () {Navigator.of(context).pop(_nameController!.text);}, icon: const Icon(Icons.check)),
+          IconButton(onPressed: () {Navigator.of(context).pop(result);}, icon: const Icon(Icons.check)),
         ],
       ),
       body: Column(
@@ -106,7 +127,7 @@ class _CandidateListState extends State<CandidateListWidget> {
                   allBrands = snapshot.data!;
                   return ListView.builder(
                     itemBuilder: (BuildContext context, int index) {
-                      return _candidateItem(searchBrands[index].name);
+                      return _candidateItem(searchBrands[index]);
                     },
                     itemCount: searchBrands.length,
                   );
@@ -119,22 +140,36 @@ class _CandidateListState extends State<CandidateListWidget> {
     );
   }
 
-  Widget _candidateItem(String title) {
+  Widget _candidateItem(Brand brand) {
     return Container(
       decoration: const BoxDecoration(
           border: Border(bottom: BorderSide(width: 1.0, color: Colors.grey))
       ),
       child:ListTile(
         title: Text(
-          title,
+          brand.name,
           style: const TextStyle(
               color:Colors.black,
               fontSize: 18.0
           ),
         ),
         onTap: () {
-          _nameController!.text = title;
+          result.clear();
+          _nameController!.text = brand.name;
           _nameController!.selection = TextSelection.fromPosition(TextPosition(offset: _nameController!.text.length));
+          result['brand'] = brand.name;
+          for (var brewery in breweries) {
+            if (brewery.id == brand.breweryId) {
+              result['brewery'] = brewery.name;
+              for (var area in areas) {
+                if (area.id == brewery.areaId) {
+                  result['area'] = area.name;
+                  break;
+                }
+              }
+              break;
+            }
+          }
         }, // タップ
       ),
     );

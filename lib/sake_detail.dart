@@ -33,20 +33,6 @@ class SakeDetailWidget extends StatefulWidget {
 //  飲み方
 //  香りグラフ
 class _SakeDetailState extends State<SakeDetailWidget> {
-  List<String> breweryList = [
-    '酒蔵名',
-    '田中酒造',
-    '遠藤酒造',
-    '佐藤酒造',
-  ];
-
-  List<String> areaList = [
-    '県名',
-    '北海道',
-    '青森県',
-    '秋田県',
-  ];
-
   List<String> specificList = [
     '名称',
     '吟醸酒',
@@ -76,8 +62,6 @@ class _SakeDetailState extends State<SakeDetailWidget> {
 
   double _height = 0;
   IconData _iconData = Icons.add;
-  String _brewery = '';
-  String _area = '';
   String _specific = '';
   String _polishing = '';
   String _material = '';
@@ -89,6 +73,8 @@ class _SakeDetailState extends State<SakeDetailWidget> {
   // TODO:他の入力項目も定義する
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _subTitleController = TextEditingController();
+  final TextEditingController _breweryController = TextEditingController();
+  final TextEditingController _areaController = TextEditingController();
 
   int selectedDataSetIndex = -1;
 
@@ -100,8 +86,6 @@ class _SakeDetailState extends State<SakeDetailWidget> {
 
   setFilters() {
     setState(() {
-      _brewery = breweryList[0];
-      _area = areaList[0];
       _specific = specificList[0];
       _drinking = drinkingList[3];
     });
@@ -166,8 +150,8 @@ class _SakeDetailState extends State<SakeDetailWidget> {
                       .set({
                     'title': _titleController.text,
                     'subtitle': _subTitleController.text,
-                    'brewery': _brewery,
-                    'area': _area,
+                    'brewery': _breweryController.text,
+                    'area': _areaController.text,
                     'specific': _specific,
                     'polishingRate': _polishing,
                     'rawMaterial': _material,
@@ -198,7 +182,12 @@ class _SakeDetailState extends State<SakeDetailWidget> {
                         List<String> params = ['銘柄名', _titleController.text];
                         Navigator.of(context).pushNamed("/candidate_list", arguments: params).then((value) {
                           if (value != null) {
-                            _titleController.text = value as String;
+                            Map<String, String> result = value as Map<String, String>;
+                            if (result['brand'] != null) {
+                              _titleController.text = result['brand'] as String;
+                              _breweryController.text = result['brewery'] as String;
+                              _areaController.text = result['area'] as String;
+                            }
                           }
                         });
                       }
@@ -398,40 +387,26 @@ class _SakeDetailState extends State<SakeDetailWidget> {
                         ),
                         Container(
                           padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                          child: DropdownButtonFormField<String>(
-                            decoration: TextFieldDecoration('酒舗'),
-                            value: _brewery,
-                            onChanged: (v) {
-                              setState(() {
-                                _brewery = v!;
-                              });
+                          child: TextField(
+                            enabled: true,
+                            maxLines: 1,
+                            controller: _breweryController,
+                            onChanged: (value) {
+                              _breweryController.text = value;
                             },
-                            items: breweryList
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
+                            decoration: TextFieldDecoration('酒舗'),
                           ),
                         ),
                         Container(
                           padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                          child: DropdownButtonFormField<String>(
-                            decoration: TextFieldDecoration('産地'),
-                            value: _area,
-                            onChanged: (v) {
-                              setState(() {
-                                _area = v!;
-                              });
+                          child: TextField(
+                            enabled: true,
+                            maxLines: 1,
+                            controller: _areaController,
+                            onChanged: (value) {
+                              _areaController.text = value;
                             },
-                            items: areaList
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
+                            decoration: TextFieldDecoration('地域'),
                           ),
                         ),
                         Container(
