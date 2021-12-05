@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:growing_sake/app_theme_color.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:growing_sake/brand.dart';
@@ -106,7 +107,7 @@ class _CandidateListState extends State<CandidateListWidget> {
                 labelText: _title,
                 floatingLabelBehavior: FloatingLabelBehavior.auto,
                 filled: true,
-                fillColor: Colors.blue.shade100,
+                fillColor: AppThemeColor.baseColor.shade50,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide.none,

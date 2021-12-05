@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/services.dart';
+import 'package:growing_sake/app_theme_color.dart';
 import 'package:growing_sake/sake_line_chart.dart';
 import 'package:growing_sake/sake_radar_chart.dart';
 import 'package:growing_sake/candidate_list.dart';
@@ -216,15 +217,15 @@ class _SakeDetailState extends State<SakeDetailWidget> {
                   alignment: Alignment.centerLeft,
                   child: ButtonTheme(
                     child: OutlineButton.icon(
-                      color: Colors.blue,
+                      color: AppThemeColor.baseColor,
                       icon: Icon(_iconData,
-                        color: Colors.blue,
+                        color: AppThemeColor.baseColor,
                       ),
                       label: const Text('詳細表示',
-                        style: TextStyle(color: Colors.blue),
+                        style: TextStyle(color: AppThemeColor.baseColor),
                       ),
                       shape: const OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.blue),
+                        borderSide: BorderSide(color: AppThemeColor.baseColor),
                         borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
                       onPressed: _handleVisible,
@@ -563,7 +564,7 @@ class TextFieldDecoration extends InputDecoration {
     labelText: text,
     floatingLabelBehavior: FloatingLabelBehavior.auto,
     filled: true,
-    fillColor: Colors.blue.shade100,
+    fillColor: AppThemeColor.baseColor.shade50,
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
       borderSide: BorderSide.none,
@@ -577,7 +578,7 @@ class TextFieldWithSuffixDecoration extends InputDecoration {
     suffixText: suffix,
     floatingLabelBehavior: FloatingLabelBehavior.auto,
     filled: true,
-    fillColor: Colors.blue.shade100,
+    fillColor: AppThemeColor.baseColor.shade50,
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
       borderSide: BorderSide.none,

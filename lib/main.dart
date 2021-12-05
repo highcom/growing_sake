@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:growing_sake/app_theme_color.dart';
 import 'package:growing_sake/candidate_list.dart';
 import 'package:growing_sake/sake_detail.dart';
 import 'package:growing_sake/sake_grid_view.dart';
@@ -20,7 +21,7 @@ class GrowingSakeApp extends StatelessWidget {
     return MaterialApp(
       title: 'Growing Sake',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: AppThemeColor.baseColor,
       ),
       onGenerateRoute: (RouteSettings settings) {
         var routes = <String, WidgetBuilder>{
@@ -49,7 +50,7 @@ class _GrowingSakeWidgetState extends State<GrowingSakeWidget> {
   int _currentIndex = 0;
   final _pageWidgets = [
     const SakeGridViewWidget(color:Colors.white, title:'Home'),
-    const SakeGridViewWidget(color:Colors.blue, title:'Timeline'),
+    const SakeGridViewWidget(color:Colors.cyanAccent, title:'Timeline'),
     FirebaseGoogleAuth(),
   ];
 
@@ -73,7 +74,7 @@ class _GrowingSakeWidgetState extends State<GrowingSakeWidget> {
           BottomNavigationBarItem(icon: Icon(Icons.menu), title: Text('Menu')),
         ],
         currentIndex: _currentIndex,
-        fixedColor: Colors.blueAccent,
+        fixedColor: AppThemeColor.baseColor,
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
       ),
