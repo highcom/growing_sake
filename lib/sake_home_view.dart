@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:growing_sake/sake_detail.dart';
 
-class SakeGridViewWidget extends StatelessWidget {
+class SakeHomeViewWidget extends StatelessWidget {
   final Color color;
   final String title;
 
-  const SakeGridViewWidget({Key? key, required this.color, required this.title}) : super(key: key);
+  const SakeHomeViewWidget({Key? key, required this.color, required this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

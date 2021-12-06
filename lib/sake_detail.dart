@@ -140,7 +140,7 @@ class _SakeDetailState extends State<SakeDetailWidget> {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Sake Detail'),
+            title: const Text('銘柄詳細'),
             automaticallyImplyLeading: true,
             actions: [
               IconButton(

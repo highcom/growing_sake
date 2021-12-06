@@ -3,7 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:growing_sake/app_theme_color.dart';
 import 'package:growing_sake/candidate_list.dart';
 import 'package:growing_sake/sake_detail.dart';
-import 'package:growing_sake/sake_grid_view.dart';
+import 'package:growing_sake/sake_home_view.dart';
+import 'package:growing_sake/sake_timeline_view.dart';
 import 'package:growing_sake/firebase_google_auth.dart';
 
 void main() async{
@@ -49,8 +50,8 @@ class GrowingSakeWidget extends StatefulWidget {
 class _GrowingSakeWidgetState extends State<GrowingSakeWidget> {
   int _currentIndex = 0;
   final _pageWidgets = [
-    const SakeGridViewWidget(color:Colors.white, title:'Home'),
-    const SakeGridViewWidget(color:Colors.cyanAccent, title:'Timeline'),
+    const SakeHomeViewWidget(color:Colors.white, title:'Home'),
+    const SakeTimelineViewWidget(color:Colors.white, title:'Timeline'),
     FirebaseGoogleAuth(),
   ];
 
@@ -64,7 +65,7 @@ class _GrowingSakeWidgetState extends State<GrowingSakeWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Growing Sake App'),
+        title: const Text('日本酒を育てる'),
       ),
       body: _pageWidgets.elementAt(_currentIndex),
       bottomNavigationBar: BottomNavigationBar(
