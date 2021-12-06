@@ -7,6 +7,20 @@ class SakeTimelineViewWidget extends StatelessWidget {
 
   const SakeTimelineViewWidget({Key? key, required this.color, required this.title}) : super(key: key);
 
+  String getSnapshotValue(QueryDocumentSnapshot snapshot, String name) {
+    try {
+      String? value = snapshot[name];
+      if (value != null && value != "") {
+        return value;
+      } else {
+        return 'ー';
+      }
+    } catch(e) {
+      print('snapshot exception' + e.toString());
+      return 'ー';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -69,23 +83,25 @@ class SakeTimelineViewWidget extends StatelessWidget {
                             children: <Widget>[
                               Container(
                                 margin: const EdgeInsets.all(4.0),
-                                child: Text(snapshot.data!.docs[index]['title']),
+                                child: Text(getSnapshotValue(snapshot.data!.docs[index], 'title')),
                               ),
                               Container(
                                 margin: const EdgeInsets.all(4.0),
-                                child: Text(snapshot.data!.docs[index]['subtitle']),
+                                // child: Text(snapshot.data!.docs[index]['subtitle']),
+                                child: Text(getSnapshotValue(snapshot.data!.docs[index], 'subtitle')),
                               ),
                               Container(
                                 margin: const EdgeInsets.all(4.0),
-                                child: Text(snapshot.data!.docs[index]['brewery']),
+                                // child: Text(snapshot.data!.docs[index]['brewery']),
+                                child: Text(getSnapshotValue(snapshot.data!.docs[index], 'brewery')),
                               ),
                               Container(
                                 margin: const EdgeInsets.all(4.0),
-                                child: Text(snapshot.data!.docs[index]['area']),
+                                child: Text(getSnapshotValue(snapshot.data!.docs[index], 'area')),
                               ),
                               Container(
                                 margin: const EdgeInsets.all(4.0),
-                                child: Text(snapshot.data!.docs[index]['specific']),
+                                child: Text(getSnapshotValue(snapshot.data!.docs[index], 'specific')),
                               ),
                             ],
                           ),
