@@ -33,7 +33,7 @@ class SakeDetailWidget extends StatefulWidget {
 //  保管温度
 //  飲み方
 //  香りグラフ
-class _SakeDetailState extends State<SakeDetailWidget> {
+class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProviderStateMixin {
   List<String> specificList = [
     '名称',
     '吟醸酒',
@@ -61,7 +61,8 @@ class _SakeDetailState extends State<SakeDetailWidget> {
 
   String args = '';
 
-  double _height = 0;
+  bool showPicker = false;
+  late AnimationController _controller;
   IconData _iconData = Icons.add;
   String _specific = '';
   String _polishing = '';
@@ -82,6 +83,10 @@ class _SakeDetailState extends State<SakeDetailWidget> {
   @override
   void initState() {
     setFilters();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
     super.initState();
   }
 
@@ -94,12 +99,13 @@ class _SakeDetailState extends State<SakeDetailWidget> {
 
   void _handleVisible() {
     setState(() {
-      if (_height > 0) {
-        _height = 0;
-        _iconData = Icons.add;
-      } else {
-        _height = 759;
+      showPicker = !showPicker;
+      if (showPicker) {
+        _controller.forward();
         _iconData = Icons.remove;
+      } else {
+        _controller.reverse();
+        _iconData = Icons.add;
       }
     });
   }
@@ -232,254 +238,253 @@ class _SakeDetailState extends State<SakeDetailWidget> {
                     ),
                   ),
                 ),
-                AnimatedContainer(
-                    height: _height,
-                    duration: const Duration(milliseconds: 1000),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    selectedDataSetIndex = -1;
-                                  });
-                                },
-                                child: Text(
-                                  'Categories'.toUpperCase(),
-                                  style: const TextStyle(
-                                    color: titleColor,
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.w300,
-                                  ),
+                SizeTransition(
+                  sizeFactor: _controller,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedDataSetIndex = -1;
+                                });
+                              },
+                              child: Text(
+                                'Categories'.toUpperCase(),
+                                style: const TextStyle(
+                                  color: titleColor,
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.w300,
                                 ),
                               ),
-                              const SizedBox(height: 4),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: SakeRadarChart().rawDataSets()
-                                    .asMap()
-                                    .map((index, value) {
-                                  final isSelected = index ==
-                                      selectedDataSetIndex;
-                                  return MapEntry(
-                                    index,
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          selectedDataSetIndex = index;
-                                        });
-                                      },
-                                      child: AnimatedContainer(
-                                        duration: const Duration(
-                                            milliseconds: 300),
-                                        margin: const EdgeInsets.symmetric(
-                                            vertical: 2),
-                                        height: 26,
-                                        decoration: BoxDecoration(
-                                          color: isSelected
-                                              ? gridColor.withOpacity(0.5)
-                                              : Colors.transparent,
-                                          borderRadius: BorderRadius.circular(
-                                              46),
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 4.0, horizontal: 6),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            AnimatedContainer(
-                                              duration: const Duration(
-                                                  milliseconds: 400),
-                                              curve: Curves.easeInToLinear,
-                                              padding: EdgeInsets.all(
-                                                  isSelected ? 8 : 6),
-                                              decoration: BoxDecoration(
-                                                color: value.color,
-                                                shape: BoxShape.circle,
-                                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: SakeRadarChart().rawDataSets()
+                                  .asMap()
+                                  .map((index, value) {
+                                final isSelected = index ==
+                                    selectedDataSetIndex;
+                                return MapEntry(
+                                  index,
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        selectedDataSetIndex = index;
+                                      });
+                                    },
+                                    child: AnimatedContainer(
+                                      duration: const Duration(
+                                          milliseconds: 300),
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 2),
+                                      height: 26,
+                                      decoration: BoxDecoration(
+                                        color: isSelected
+                                            ? gridColor.withOpacity(0.5)
+                                            : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(
+                                            46),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 4.0, horizontal: 6),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          AnimatedContainer(
+                                            duration: const Duration(
+                                                milliseconds: 400),
+                                            curve: Curves.easeInToLinear,
+                                            padding: EdgeInsets.all(
+                                                isSelected ? 8 : 6),
+                                            decoration: BoxDecoration(
+                                              color: value.color,
+                                              shape: BoxShape.circle,
                                             ),
-                                            const SizedBox(width: 8),
-                                            AnimatedDefaultTextStyle(
-                                              duration: const Duration(
-                                                  milliseconds: 300),
-                                              curve: Curves.easeInToLinear,
-                                              style: TextStyle(
-                                                color: isSelected
-                                                    ? value.color
-                                                    : gridColor,
-                                              ),
-                                              child: Text(value.title),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          AnimatedDefaultTextStyle(
+                                            duration: const Duration(
+                                                milliseconds: 300),
+                                            curve: Curves.easeInToLinear,
+                                            style: TextStyle(
+                                              color: isSelected
+                                                  ? value.color
+                                                  : gridColor,
                                             ),
-                                          ],
-                                        ),
+                                            child: Text(value.title),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  );
-                                })
-                                    .values
-                                    .toList(),
-                              ),
-                              AspectRatio(
-                                aspectRatio: 1.3,
-                                child: RadarChart(
-                                  RadarChartData(
-                                    radarTouchData: RadarTouchData(
-                                        touchCallback: (FlTouchEvent event,
-                                            response) {
-                                          if (!event
-                                              .isInterestedForInteractions) {
-                                            setState(() {
-                                              selectedDataSetIndex = -1;
-                                            });
-                                            return;
-                                          }
-                                          setState(() {
-                                            selectedDataSetIndex =
-                                                response?.touchedSpot
-                                                    ?.touchedDataSetIndex ?? -1;
-                                          });
-                                        }),
-                                    dataSets: SakeRadarChart().showingDataSets(
-                                        selectedDataSetIndex),
-                                    radarBackgroundColor: Colors.transparent,
-                                    borderData: FlBorderData(show: false),
-                                    radarBorderData: const BorderSide(
-                                        color: Colors.transparent),
-                                    titlePositionPercentageOffset: 0.2,
-                                    titleTextStyle:
-                                    const TextStyle(
-                                        color: titleColor, fontSize: 14),
-                                    getTitle: (index) {
-                                      switch (index) {
-                                        case 0:
-                                          return '甘味';
-                                        case 1:
-                                          return '酸味';
-                                        case 2:
-                                          return '辛味';
-                                        case 3:
-                                          return '苦味';
-                                        case 4:
-                                          return '渋味';
-                                        default:
-                                          return '';
-                                      }
-                                    },
-                                    tickCount: 1,
-                                    ticksTextStyle:
-                                    const TextStyle(color: Colors.transparent,
-                                        fontSize: 10),
-                                    tickBorderData: const BorderSide(
-                                        color: Colors.transparent),
-                                    gridBorderData: const BorderSide(
-                                        color: gridColor, width: 2),
                                   ),
-                                  swapAnimationDuration: const Duration(
-                                      milliseconds: 400),
+                                );
+                              })
+                                  .values
+                                  .toList(),
+                            ),
+                            AspectRatio(
+                              aspectRatio: 1.3,
+                              child: RadarChart(
+                                RadarChartData(
+                                  radarTouchData: RadarTouchData(
+                                      touchCallback: (FlTouchEvent event,
+                                          response) {
+                                        if (!event
+                                            .isInterestedForInteractions) {
+                                          setState(() {
+                                            selectedDataSetIndex = -1;
+                                          });
+                                          return;
+                                        }
+                                        setState(() {
+                                          selectedDataSetIndex =
+                                              response?.touchedSpot
+                                                  ?.touchedDataSetIndex ?? -1;
+                                        });
+                                      }),
+                                  dataSets: SakeRadarChart().showingDataSets(
+                                      selectedDataSetIndex),
+                                  radarBackgroundColor: Colors.transparent,
+                                  borderData: FlBorderData(show: false),
+                                  radarBorderData: const BorderSide(
+                                      color: Colors.transparent),
+                                  titlePositionPercentageOffset: 0.2,
+                                  titleTextStyle:
+                                  const TextStyle(
+                                      color: titleColor, fontSize: 14),
+                                  getTitle: (index) {
+                                    switch (index) {
+                                      case 0:
+                                        return '甘味';
+                                      case 1:
+                                        return '酸味';
+                                      case 2:
+                                        return '辛味';
+                                      case 3:
+                                        return '苦味';
+                                      case 4:
+                                        return '渋味';
+                                      default:
+                                        return '';
+                                    }
+                                  },
+                                  tickCount: 1,
+                                  ticksTextStyle:
+                                  const TextStyle(color: Colors.transparent,
+                                      fontSize: 10),
+                                  tickBorderData: const BorderSide(
+                                      color: Colors.transparent),
+                                  gridBorderData: const BorderSide(
+                                      color: gridColor, width: 2),
                                 ),
+                                swapAnimationDuration: const Duration(
+                                    milliseconds: 400),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                          child: TextField(
-                            enabled: true,
-                            maxLines: 1,
-                            controller: _breweryController,
-                            onChanged: (value) {
-                              _breweryController.text = value;
-                            },
-                            decoration: TextFieldDecoration('酒舗'),
-                          ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                        child: TextField(
+                          enabled: true,
+                          maxLines: 1,
+                          controller: _breweryController,
+                          onChanged: (value) {
+                            _breweryController.text = value;
+                          },
+                          decoration: TextFieldDecoration('酒舗'),
                         ),
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                          child: TextField(
-                            enabled: true,
-                            maxLines: 1,
-                            controller: _areaController,
-                            onChanged: (value) {
-                              _areaController.text = value;
-                            },
-                            decoration: TextFieldDecoration('地域'),
-                          ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                        child: TextField(
+                          enabled: true,
+                          maxLines: 1,
+                          controller: _areaController,
+                          onChanged: (value) {
+                            _areaController.text = value;
+                          },
+                          decoration: TextFieldDecoration('地域'),
                         ),
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                          child: DropdownButtonFormField<String>(
-                            decoration: TextFieldDecoration('特定名称'),
-                            value: _specific,
-                            onChanged: (v) {
-                              setState(() {
-                                _specific = v!;
-                              });
-                            },
-                            items: specificList
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                          ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                        child: DropdownButtonFormField<String>(
+                          decoration: TextFieldDecoration('特定名称'),
+                          value: _specific,
+                          onChanged: (v) {
+                            setState(() {
+                              _specific = v!;
+                            });
+                          },
+                          items: specificList
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
                         ),
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                          child: TextField(
-                            enabled: true,
-                            maxLines: 1,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [FilteringTextInputFormatter
-                                .digitsOnly
-                            ],
-                            onChanged: (value) {
-                              setState(() {
-                                _polishing = value;
-                              });
-                            },
-                            decoration: TextFieldWithSuffixDecoration(
-                                '精米歩合', '％'),
-                          ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                        child: TextField(
+                          enabled: true,
+                          maxLines: 1,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [FilteringTextInputFormatter
+                              .digitsOnly
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              _polishing = value;
+                            });
+                          },
+                          decoration: TextFieldWithSuffixDecoration(
+                              '精米歩合', '％'),
                         ),
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                          child: TextField(
-                            enabled: true,
-                            maxLines: 1,
-                            onChanged: (value) {
-                              setState(() {
-                                _material = value;
-                              });
-                            },
-                            decoration: TextFieldDecoration('原材料'),
-                          ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                        child: TextField(
+                          enabled: true,
+                          maxLines: 1,
+                          onChanged: (value) {
+                            setState(() {
+                              _material = value;
+                            });
+                          },
+                          decoration: TextFieldDecoration('原材料'),
                         ),
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                          child: TextField(
-                            enabled: true,
-                            maxLines: 1,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [FilteringTextInputFormatter
-                                .digitsOnly
-                            ],
-                            onChanged: (value) {
-                              setState(() {
-                                _capacity = value;
-                              });
-                            },
-                            decoration: TextFieldWithSuffixDecoration(
-                                '内容量', 'ml'),
-                          ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                        child: TextField(
+                          enabled: true,
+                          maxLines: 1,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [FilteringTextInputFormatter
+                              .digitsOnly
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              _capacity = value;
+                            });
+                          },
+                          decoration: TextFieldWithSuffixDecoration(
+                              '内容量', 'ml'),
                         ),
-                      ],
-                    )
+                      ),
+                    ],
+                  ),
                 ),
                 Container(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
