@@ -58,52 +58,54 @@ class SakeTimelineViewWidget extends StatelessWidget {
                             children: <Widget>[
                               Container(
                                 margin: const EdgeInsets.all(4.0),
-                                child: const Text('銘柄名：'),
+                                child: const Text('銘柄名'),
                               ),
                               Container(
                                 margin: const EdgeInsets.all(4.0),
-                                child: const Text('サブ銘柄名：'),
+                                child: const Text('サブ銘柄名'),
                               ),
                               Container(
                                 margin: const EdgeInsets.all(4.0),
-                                child: const Text('酒舗：'),
+                                child: const Text('酒舗'),
                               ),
                               Container(
                                 margin: const EdgeInsets.all(4.0),
-                                child: const Text('地域名：'),
+                                child: const Text('地域名'),
                               ),
                               Container(
                                 margin: const EdgeInsets.all(4.0),
-                                child: const Text('特定名称：'),
+                                child: const Text('特定名称'),
                               ),
                             ],
                           ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Container(
-                                margin: const EdgeInsets.all(4.0),
-                                child: Text(getSnapshotValue(snapshot.data!.docs[index], 'title')),
-                              ),
-                              Container(
-                                margin: const EdgeInsets.all(4.0),
-                                // child: Text(snapshot.data!.docs[index]['subtitle']),
-                                child: Text(getSnapshotValue(snapshot.data!.docs[index], 'subtitle')),
-                              ),
-                              Container(
-                                margin: const EdgeInsets.all(4.0),
-                                // child: Text(snapshot.data!.docs[index]['brewery']),
-                                child: Text(getSnapshotValue(snapshot.data!.docs[index], 'brewery')),
-                              ),
-                              Container(
-                                margin: const EdgeInsets.all(4.0),
-                                child: Text(getSnapshotValue(snapshot.data!.docs[index], 'area')),
-                              ),
-                              Container(
-                                margin: const EdgeInsets.all(4.0),
-                                child: Text(getSnapshotValue(snapshot.data!.docs[index], 'specific')),
-                              ),
-                            ],
+                          Flexible(child:
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Container(
+                                  margin: const EdgeInsets.all(4.0),
+                                  child: Text('：' + getSnapshotValue(snapshot.data!.docs[index], 'title'), overflow: TextOverflow.ellipsis,),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.all(4.0),
+                                  // child: Text(snapshot.data!.docs[index]['subtitle']),
+                                  child: Text('：' + getSnapshotValue(snapshot.data!.docs[index], 'subtitle'), overflow: TextOverflow.ellipsis,),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.all(4.0),
+                                  // child: Text(snapshot.data!.docs[index]['brewery']),
+                                  child: Text('：' + getSnapshotValue(snapshot.data!.docs[index], 'brewery'), overflow: TextOverflow.ellipsis,),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.all(4.0),
+                                  child: Text('：' + getSnapshotValue(snapshot.data!.docs[index], 'area'), overflow: TextOverflow.ellipsis,),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.all(4.0),
+                                  child: Text('：' + getSnapshotValue(snapshot.data!.docs[index], 'specific'), overflow: TextOverflow.ellipsis,),
+                                ),
+                              ],
+                            )
                           ),
                         ],
                       )),

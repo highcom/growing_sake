@@ -40,8 +40,11 @@ class SakeHomeViewWidget extends StatelessWidget {
                     children: <Widget>[
                       Image.asset(assetsImage, fit: BoxFit.cover,),
                       Container(
-                        margin: const EdgeInsets.all(10.0),
-                        child: Text(snapshot.data!.docs[index]['title']),
+                        margin: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                        child: Text(
+                          snapshot.data!.docs[index]['title'],
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,),
                       ),
                     ],
                   )),
