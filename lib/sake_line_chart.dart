@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-class SakeLineChart {
+class SakeLineChart extends StatefulWidget {
+  const SakeLineChart({Key? key}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => _SakeLineChartState();
+}
+
+class _SakeLineChartState extends State<SakeLineChart> {
   List<Color> gradientColors = [
     const Color(0xff23b6e6),
     const Color(0xff02d39a),
@@ -102,6 +109,29 @@ class SakeLineChart {
             show: true,
             colors:
             gradientColors.map((color) => color.withOpacity(0.3)).toList(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: <Widget>[
+        AspectRatio(
+          aspectRatio: 1.70,
+          child: Container(
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(18),
+                ),
+                color: Color(0xff232d37)),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  right: 18.0, left: 12.0, top: 24, bottom: 12),
+              child: LineChart(mainData()),
+            ),
           ),
         ),
       ],
