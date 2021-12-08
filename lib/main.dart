@@ -49,6 +49,7 @@ class GrowingSakeWidget extends StatefulWidget {
 
 class _GrowingSakeWidgetState extends State<GrowingSakeWidget> {
   int _currentIndex = 0;
+  bool _fabVisible = true;
   final _pageWidgets = [
     const SakeHomeViewWidget(color:Colors.white, title:'Home'),
     const SakeTimelineViewWidget(color:Colors.white, title:'Timeline'),
@@ -79,13 +80,24 @@ class _GrowingSakeWidgetState extends State<GrowingSakeWidget> {
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _DetailSakeTransition,
-        tooltip: 'Transition',
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton:
+        Visibility(
+          visible: _fabVisible,
+          child: FloatingActionButton(
+            onPressed: _DetailSakeTransition,
+            tooltip: 'Transition',
+            child: const Icon(Icons.add),
+          ),
+        ),
     );
   }
 
-  void _onItemTapped(int index) => setState(() => _currentIndex = index );
+  void _onItemTapped(int index) => setState(() {
+    _currentIndex = index;
+    if (_currentIndex == 0) {
+      _fabVisible = true;
+    } else {
+      _fabVisible = false;
+    }
+  });
 }
