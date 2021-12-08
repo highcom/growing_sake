@@ -27,7 +27,7 @@ class SakeTimelineViewWidget extends StatelessWidget {
     var assetsImage = "images/ic_sake.png";
     return Scaffold(
       body: StreamBuilder(
-          stream: FirebaseFirestore.instance.collection('BrandList').snapshots(),
+          stream: FirebaseFirestore.instance.collection('Brands').snapshots(),
           builder: (BuildContext context,
               AsyncSnapshot<QuerySnapshot> snapshot) {
             if (!snapshot.hasData) {

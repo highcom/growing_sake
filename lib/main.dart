@@ -26,7 +26,7 @@ class GrowingSakeApp extends StatelessWidget {
       ),
       onGenerateRoute: (RouteSettings settings) {
         var routes = <String, WidgetBuilder>{
-          '/sake_detail': (BuildContext context) => const SakeDetailWidget(),
+          '/sake_detail': (BuildContext context) => SakeDetailWidget(arguments: settings.arguments),
           '/candidate_list': (BuildContext context) => CandidateListWidget(arguments: settings.arguments),
         };
 

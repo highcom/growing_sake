@@ -8,7 +8,8 @@ import 'package:growing_sake/sake_radar_chart.dart';
 import 'package:growing_sake/candidate_list.dart';
 
 class SakeDetailWidget extends StatefulWidget {
-  const SakeDetailWidget({Key? key}) : super(key: key);
+  final arguments;
+  const SakeDetailWidget({Key? key, required this.arguments}) : super(key: key);
 
   @override
   State<SakeDetailWidget> createState() => _SakeDetailState();
@@ -56,29 +57,33 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
     '飛び切り燗(55℃)',
   ];
 
-  String args = '';
+  String? docId;
+  bool firstTime = false;
 
   bool showPicker = false;
   late AnimationController _controller;
   IconData _iconData = Icons.add;
-  String _specific = '';
-  String _polishing = '';
-  String _material = '';
-  String _capacity = '';
-  String _purchase = '';
-  String _temperature = '';
-  String _drinking = '';
 
-  // TODO:他の入力項目も定義する
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _subTitleController = TextEditingController();
-  final TextEditingController _breweryController = TextEditingController();
-  final TextEditingController _areaController = TextEditingController();
+  final TextEditingController _title = TextEditingController();
+  final TextEditingController _subtitle = TextEditingController();
+  final TextEditingController _brewery = TextEditingController();
+  final TextEditingController _area = TextEditingController();
+  final TextEditingController _specific = TextEditingController();
+  final TextEditingController _polishing = TextEditingController();
+  final TextEditingController _material = TextEditingController();
+  final TextEditingController _capacity = TextEditingController();
+  final TextEditingController _purchase = TextEditingController();
+  final TextEditingController _temperature = TextEditingController();
+  final TextEditingController _drinking = TextEditingController();
 
   int selectedDataSetIndex = -1;
 
   @override
   void initState() {
+    if (widget.arguments != null) {
+      docId = widget.arguments as String;
+    }
+    firstTime = true;
     setFilters();
     _controller = AnimationController(
       vsync: this,
@@ -89,8 +94,8 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
 
   setFilters() {
     setState(() {
-      _specific = specificList[0];
-      _drinking = drinkingList[3];
+      _specific.text = specificList[0];
+      _drinking.text = drinkingList[3];
     });
   }
 
@@ -107,31 +112,46 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
     });
   }
 
+  void setControllerValue(TextEditingController controller, String? value) {
+    if (value != null) {
+      controller.text = value;
+    } else {
+      controller.text = "";
+    }
+    controller.selection = TextSelection.fromPosition(TextPosition(offset: controller.text.length));
+  }
+
   Future<DocumentSnapshot> getBrandData() async {
-    Future<DocumentSnapshot> future = FirebaseFirestore.instance.collection('BrandList').doc(args).get();
+    Future<DocumentSnapshot> future;
+    if (docId != null) {
+      future = FirebaseFirestore.instance.collection('Brands').doc(docId).get();
+    } else {
+      future = FirebaseFirestore.instance.collection('Base').doc('defaultDoc').get();
+    }
     DocumentSnapshot snapshot = await future;
-    _titleController.text = snapshot.get('title');
-    _subTitleController.text = snapshot.get('subtitle');
-    // TODO:一覧と合わないデータが入るとエラーになるので一旦コメントアウト
-    // _brewery = snapshot.get('brewery');
-    // _area = snapshot.get('area');
-    _specific = snapshot.get('specific');
-    _polishing = snapshot.get('polishingRate').toString();
-    _material = snapshot.get('rawMaterial');
-    _capacity = snapshot.get('capacity').toString();
-    // _purchase = snapshot.get('purchase');
-    _temperature = snapshot.get('storageTemperature').toString();
-    // _drinking = snapshot.get('howToDrink');
+    if (firstTime == true) {
+      _title.text = snapshot.get('title');
+      _subtitle.text = snapshot.get('subtitle');
+      _brewery.text = snapshot.get('brewery');
+      _area.text = snapshot.get('area');
+      _specific.text = snapshot.get('specific');
+      _polishing.text = snapshot.get('polishing').toString();
+      _material.text = snapshot.get('material');
+      _capacity.text = snapshot.get('capacity').toString();
+      if (docId != null) {
+        _purchase.text = snapshot.get('purchase').toDate().toString();
+      } else {
+        _purchase.text = DateTime.now().toString();
+      }
+      _temperature.text = snapshot.get('temperature').toString();
+      _drinking.text = snapshot.get('drinking');
+      firstTime = false;
+    }
     return future;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (ModalRoute.of(context)!.settings.arguments != null) {
-      args = ModalRoute.of(context)!.settings.arguments as String;
-    } else {
-      args = '9s7xq5AmBX6jXKRRICK8';
-    }
     return FutureBuilder<DocumentSnapshot>(
       future: getBrandData(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
@@ -149,21 +169,22 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
               IconButton(
                 icon: const Icon(Icons.check),
                 onPressed: () async {
-                  await FirebaseFirestore.instance.collection('BrandList')
+                  await FirebaseFirestore.instance.collection('Brands')
                       .doc()
                       .set({
-                    'title': _titleController.text,
-                    'subtitle': _subTitleController.text,
-                    'brewery': _breweryController.text,
-                    'area': _areaController.text,
-                    'specific': _specific,
-                    'polishingRate': _polishing,
-                    'rawMaterial': _material,
-                    'capacity': _capacity,
-                    'purchase': _purchase,
-                    'storageTemperture': _temperature,
-                    'howToDrink': _drinking,
-                  });
+                        'title': _title.text,
+                        'subtitle': _subtitle.text,
+                        'brewery': _brewery.text,
+                        'area': _area.text,
+                        'specific': _specific.text,
+                        'polishing': _polishing.text,
+                        'material': _material.text,
+                        'capacity': _capacity.text,
+                        'purchase': DateTime.parse(_purchase.text),
+                        'temperature': _temperature.text,
+                        'drinking': _drinking.text,
+                      });
+                  Navigator.of(context).pop();
                 },
               ),
             ],
@@ -175,7 +196,7 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                 Container(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                   child: TextField(
-                    controller: _titleController,
+                    controller: _title,
                     enabled: true,
                     maxLines: 1,
                     onTap: () {
@@ -183,14 +204,14 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                       if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
                         FocusManager.instance.primaryFocus!.unfocus();
                       } else {
-                        List<String> params = ['銘柄名', _titleController.text];
+                        List<String> params = ['銘柄名', _title.text];
                         Navigator.of(context).pushNamed("/candidate_list", arguments: params).then((value) {
                           if (value != null) {
                             Map<String, String> result = value as Map<String, String>;
                             if (result['brand'] != null) {
-                              _titleController.text = result['brand'] as String;
-                              _breweryController.text = result['brewery'] as String;
-                              _areaController.text = result['area'] as String;
+                              _title.text = result['brand'] as String;
+                              _brewery.text = result['brewery'] as String;
+                              _area.text = result['area'] as String;
                             }
                           }
                         });
@@ -203,10 +224,11 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                   height: 45,
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                   child: TextField(
+                    controller: _subtitle,
                     enabled: true,
                     maxLines: 1,
                     onChanged: (value) {
-                      _subTitleController.text = value;
+                      setControllerValue(_subtitle, value);
                     },
                     decoration: TextFieldDecoration('サブ銘柄名'),
                   ),
@@ -241,16 +263,16 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: SakeRadarChart(title: _titleController.text),
+                        child: SakeRadarChart(title: _title.text),
                       ),
                       Container(
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                         child: TextField(
+                          controller: _brewery,
                           enabled: true,
                           maxLines: 1,
-                          controller: _breweryController,
                           onChanged: (value) {
-                            _breweryController.text = value;
+                            setControllerValue(_brewery, value);
                           },
                           decoration: TextFieldDecoration('酒舗'),
                         ),
@@ -258,11 +280,11 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                       Container(
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                         child: TextField(
+                          controller: _area,
                           enabled: true,
                           maxLines: 1,
-                          controller: _areaController,
                           onChanged: (value) {
-                            _areaController.text = value;
+                            setControllerValue(_area, value);
                           },
                           decoration: TextFieldDecoration('地域'),
                         ),
@@ -271,11 +293,9 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                         child: DropdownButtonFormField<String>(
                           decoration: TextFieldDecoration('特定名称'),
-                          value: _specific,
-                          onChanged: (v) {
-                            setState(() {
-                              _specific = v!;
-                            });
+                          value: _specific.text,
+                          onChanged: (value) {
+                            setControllerValue(_specific, value);
                           },
                           items: specificList
                               .map<DropdownMenuItem<String>>((String value) {
@@ -289,6 +309,7 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                       Container(
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                         child: TextField(
+                          controller: _polishing,
                           enabled: true,
                           maxLines: 1,
                           keyboardType: TextInputType.number,
@@ -296,9 +317,7 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                               .digitsOnly
                           ],
                           onChanged: (value) {
-                            setState(() {
-                              _polishing = value;
-                            });
+                            setControllerValue(_polishing, value);
                           },
                           decoration: TextFieldWithSuffixDecoration(
                               '精米歩合', '％'),
@@ -307,12 +326,11 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                       Container(
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                         child: TextField(
+                          controller: _material,
                           enabled: true,
                           maxLines: 1,
                           onChanged: (value) {
-                            setState(() {
-                              _material = value;
-                            });
+                            setControllerValue(_material, value);
                           },
                           decoration: TextFieldDecoration('原材料'),
                         ),
@@ -320,6 +338,7 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                       Container(
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                         child: TextField(
+                          controller: _capacity,
                           enabled: true,
                           maxLines: 1,
                           keyboardType: TextInputType.number,
@@ -327,9 +346,7 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                               .digitsOnly
                           ],
                           onChanged: (value) {
-                            setState(() {
-                              _capacity = value;
-                            });
+                            setControllerValue(_capacity, value);
                           },
                           decoration: TextFieldWithSuffixDecoration(
                               '内容量', 'ml'),
@@ -341,12 +358,11 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                 Container(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                   child: TextField(
+                    controller: _purchase,
                     enabled: true,
                     maxLines: 1,
                     onChanged: (value) {
-                      setState(() {
-                        _purchase = value;
-                      });
+                      setControllerValue(_purchase, value);
                     },
                     decoration: TextFieldDecoration('購入日'),
                   ),
@@ -354,14 +370,13 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                 Container(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                   child: TextField(
+                    controller: _temperature,
                     enabled: true,
                     maxLines: 1,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     onChanged: (value) {
-                      setState(() {
-                        _temperature = value;
-                      });
+                      setControllerValue(_temperature, value);
                     },
                     decoration: TextFieldWithSuffixDecoration('保管温度', '度'),
                   ),
@@ -370,11 +385,9 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                   child: DropdownButtonFormField<String>(
                     decoration: TextFieldDecoration('飲み方'),
-                    value: _drinking,
-                    onChanged: (v) {
-                      setState(() {
-                        _drinking = v!;
-                      });
+                    value: _drinking.text,
+                    onChanged: (value) {
+                      setControllerValue(_drinking, value);
                     },
                     items: drinkingList
                         .map<DropdownMenuItem<String>>((String value) {
