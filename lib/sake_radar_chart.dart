@@ -18,6 +18,7 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
 
   int selectedDataSetIndex = -1;
 
+  // TODO:全部同じ値にすると応答がなくなる
   final PrimitiveParameter _sweetness = PrimitiveParameter(param: 1);
   final PrimitiveParameter _sourness = PrimitiveParameter(param: 1);
   final PrimitiveParameter _pungent = PrimitiveParameter(param: 1);
@@ -65,7 +66,7 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
     ];
   }
 
-  Widget roundRaisedButton(IconData icon, PrimitiveParameter parameter, int value) {
+  Widget roundRaisedButton(IconData icon, StateSetter stateSetter, PrimitiveParameter parameter, int value) {
     return RaisedButton(
       child: Icon(icon),
       color: Colors.white,
@@ -76,77 +77,86 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
           style: BorderStyle.solid,
         ),
       ),
-      onPressed: () { parameter.param += value; },
+      onPressed: () {
+        stateSetter(() {
+          if ((value < 0 && parameter.param > 1) || (value > 0 && parameter.param < 5)) {
+            parameter.param += value;
+          }
+        });
+      },
     );
   }
 
   void showInputDialog(BuildContext context) {
     showDialog<String>(
       context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text('AlertDialog Title'),
-        content: SingleChildScrollView(
-          child: ListBody(
-            children: <Widget>[
-              Column(
-                children: [
-                  Row(
+      builder: (BuildContext context) {
+        return StatefulBuilder(builder: (context, setState) {
+          return AlertDialog(
+            title: const Text('AlertDialog Title'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Column(
                     children: [
-                      const Text('甘味'),
-                      roundRaisedButton(Icons.remove, _sweetness, -1),
-                      Text(_sweetness.param.toString()),
-                      roundRaisedButton(Icons.add, _sweetness, 1),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Text('酸味'),
-                      roundRaisedButton(Icons.remove, _sourness, -1),
-                      Text(_sourness.param.toString()),
-                      roundRaisedButton(Icons.add, _sourness, 1),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Text('辛味'),
-                      roundRaisedButton(Icons.remove, _pungent, -1),
-                      Text(_pungent.param.toString()),
-                      roundRaisedButton(Icons.add, _pungent, 1),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Text('苦味'),
-                      roundRaisedButton(Icons.remove, _bitterness, -1),
-                      Text(_bitterness.param.toString()),
-                      roundRaisedButton(Icons.add, _bitterness, 1),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Text('渋味'),
-                      roundRaisedButton(Icons.remove, _astringent, -1),
-                      Text(_astringent.param.toString()),
-                      roundRaisedButton(Icons.add, _astringent, 1),
-                    ],
+                      Row(
+                        children: [
+                          const Text('甘味'),
+                          roundRaisedButton(Icons.remove, setState, _sweetness, -1),
+                          Text(_sweetness.param.toString()),
+                          roundRaisedButton(Icons.add, setState, _sweetness, 1),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Text('酸味'),
+                          roundRaisedButton(Icons.remove, setState, _sourness, -1),
+                          Text(_sourness.param.toString()),
+                          roundRaisedButton(Icons.add, setState, _sourness, 1),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Text('辛味'),
+                          roundRaisedButton(Icons.remove, setState, _pungent, -1),
+                          Text(_pungent.param.toString()),
+                          roundRaisedButton(Icons.add, setState, _pungent, 1),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Text('苦味'),
+                          roundRaisedButton(Icons.remove, setState, _bitterness, -1),
+                          Text(_bitterness.param.toString()),
+                          roundRaisedButton(Icons.add, setState, _bitterness, 1),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Text('渋味'),
+                          roundRaisedButton(Icons.remove, setState, _astringent, -1),
+                          Text(_astringent.param.toString()),
+                          roundRaisedButton(Icons.add, setState, _astringent, 1),
+                        ],
+                      ),
+                    ], // コンテンツ
                   ),
                 ],
-                // コンテンツ
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'Cancel'),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'OK'),
+                child: const Text('OK'),
               ),
             ],
-          ),
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'Cancel'),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'OK'),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
+          );
+        });
+      },
     );
   }
 
@@ -244,12 +254,14 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
               radarTouchData: RadarTouchData(
                   touchCallback: (FlTouchEvent event,
                       response) {
-                    if (!event
-                        .isInterestedForInteractions) {
+                    if (!event.isInterestedForInteractions) {
                       setState(() {
                         selectedDataSetIndex = -1;
                       });
-                      showInputDialog(context);
+                      if (response != null) {
+                        // TODO:ダイアログで設定した結果が再度タップしないと反映されない
+                        showInputDialog(context);
+                      }
                       return;
                     }
                     setState(() {
