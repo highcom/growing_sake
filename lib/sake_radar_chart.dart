@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 const artColor = Color(0xff63e7e5);
+const baseColor = Color(0x44afafaf);
 
 class SakeRadarChart extends StatefulWidget {
   final String title;
@@ -20,12 +21,11 @@ class PrimitiveParameter {
 }
 
 class FiveFlavorParameter {
-  // TODO:全部同じ値にすると応答がなくなる
-  final PrimitiveParameter _sweetness = PrimitiveParameter(param: 1);
-  final PrimitiveParameter _sourness = PrimitiveParameter(param: 1);
-  final PrimitiveParameter _pungent = PrimitiveParameter(param: 1);
-  final PrimitiveParameter _bitterness = PrimitiveParameter(param: 1);
-  final PrimitiveParameter _astringent = PrimitiveParameter(param: 2);
+  final PrimitiveParameter _sweetness = PrimitiveParameter(param: 3);
+  final PrimitiveParameter _sourness = PrimitiveParameter(param: 3);
+  final PrimitiveParameter _pungent = PrimitiveParameter(param: 3);
+  final PrimitiveParameter _bitterness = PrimitiveParameter(param: 3);
+  final PrimitiveParameter _astringent = PrimitiveParameter(param: 3);
 }
 
 class RawDataSet {
@@ -77,11 +77,33 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
         title: widget.title,
         color: artColor,
         values: [
-          _fiveFlavorParameter._sweetness.param * 100,
-          _fiveFlavorParameter._sourness.param * 100,
-          _fiveFlavorParameter._pungent.param * 100,
-          _fiveFlavorParameter._bitterness.param * 100,
-          _fiveFlavorParameter._astringent.param * 100,
+          _fiveFlavorParameter._sweetness.param.toDouble(),
+          _fiveFlavorParameter._sourness.param.toDouble(),
+          _fiveFlavorParameter._pungent.param.toDouble(),
+          _fiveFlavorParameter._bitterness.param.toDouble(),
+          _fiveFlavorParameter._astringent.param.toDouble(),
+        ],
+      ),
+      RawDataSet(
+        title: '最大',
+        color: baseColor,
+        values: [
+          5,
+          5,
+          5,
+          5,
+          5,
+        ],
+      ),
+      RawDataSet(
+        title: '最小',
+        color: baseColor,
+        values: [
+          1,
+          1,
+          1,
+          1,
+          1,
         ],
       ),
     ];
