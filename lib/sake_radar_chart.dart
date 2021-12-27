@@ -14,16 +14,37 @@ class SakeRadarChart extends StatefulWidget {
 const gridColor = Color(0xff68739f);
 const titleColor = Color(0xff8c95db);
 
-class _SakeRadarChartState extends State<SakeRadarChart> {
+class PrimitiveParameter {
+  int param;
+  PrimitiveParameter({required this.param});
+}
 
-  int selectedDataSetIndex = -1;
-
+class FiveFlavorParameter {
   // TODO:全部同じ値にすると応答がなくなる
   final PrimitiveParameter _sweetness = PrimitiveParameter(param: 1);
   final PrimitiveParameter _sourness = PrimitiveParameter(param: 1);
   final PrimitiveParameter _pungent = PrimitiveParameter(param: 1);
   final PrimitiveParameter _bitterness = PrimitiveParameter(param: 1);
   final PrimitiveParameter _astringent = PrimitiveParameter(param: 2);
+}
+
+class RawDataSet {
+  final String title;
+  final Color color;
+  final List<double> values;
+
+  RawDataSet({
+    required this.title,
+    required this.color,
+    required this.values,
+  });
+}
+
+class _SakeRadarChartState extends State<SakeRadarChart> {
+
+  int selectedDataSetIndex = -1;
+
+  FiveFlavorParameter _fiveFlavorParameter = FiveFlavorParameter();
 
   List<RadarDataSet> showingDataSets(int selectedDataSetIndex) {
     return rawDataSets().asMap().entries.map((entry) {
@@ -56,11 +77,11 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
         title: widget.title,
         color: artColor,
         values: [
-          _sweetness.param * 100,
-          _sourness.param * 100,
-          _pungent.param * 100,
-          _bitterness.param * 100,
-          _astringent.param * 100,
+          _fiveFlavorParameter._sweetness.param * 100,
+          _fiveFlavorParameter._sourness.param * 100,
+          _fiveFlavorParameter._pungent.param * 100,
+          _fiveFlavorParameter._bitterness.param * 100,
+          _fiveFlavorParameter._astringent.param * 100,
         ],
       ),
     ];
@@ -87,8 +108,11 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
     );
   }
 
-  void showInputDialog(BuildContext context) {
-    showDialog<String>(
+  Future<FiveFlavorParameter?> showInputDialog(BuildContext context, FiveFlavorParameter params) {
+    FiveFlavorParameter _fiveFlavor = FiveFlavorParameter();
+    _fiveFlavor = params;
+
+    return showDialog<FiveFlavorParameter>(
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(builder: (context, setState) {
@@ -102,41 +126,41 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
                       Row(
                         children: [
                           const Text('甘味'),
-                          roundRaisedButton(Icons.remove, setState, _sweetness, -1),
-                          Text(_sweetness.param.toString()),
-                          roundRaisedButton(Icons.add, setState, _sweetness, 1),
+                          roundRaisedButton(Icons.remove, setState, _fiveFlavor._sweetness, -1),
+                          Text(_fiveFlavor._sweetness.param.toString()),
+                          roundRaisedButton(Icons.add, setState, _fiveFlavor._sweetness, 1),
                         ],
                       ),
                       Row(
                         children: [
                           const Text('酸味'),
-                          roundRaisedButton(Icons.remove, setState, _sourness, -1),
-                          Text(_sourness.param.toString()),
-                          roundRaisedButton(Icons.add, setState, _sourness, 1),
+                          roundRaisedButton(Icons.remove, setState, _fiveFlavor._sourness, -1),
+                          Text(_fiveFlavor._sourness.param.toString()),
+                          roundRaisedButton(Icons.add, setState, _fiveFlavor._sourness, 1),
                         ],
                       ),
                       Row(
                         children: [
                           const Text('辛味'),
-                          roundRaisedButton(Icons.remove, setState, _pungent, -1),
-                          Text(_pungent.param.toString()),
-                          roundRaisedButton(Icons.add, setState, _pungent, 1),
+                          roundRaisedButton(Icons.remove, setState, _fiveFlavor._pungent, -1),
+                          Text(_fiveFlavor._pungent.param.toString()),
+                          roundRaisedButton(Icons.add, setState, _fiveFlavor._pungent, 1),
                         ],
                       ),
                       Row(
                         children: [
                           const Text('苦味'),
-                          roundRaisedButton(Icons.remove, setState, _bitterness, -1),
-                          Text(_bitterness.param.toString()),
-                          roundRaisedButton(Icons.add, setState, _bitterness, 1),
+                          roundRaisedButton(Icons.remove, setState, _fiveFlavor._bitterness, -1),
+                          Text(_fiveFlavor._bitterness.param.toString()),
+                          roundRaisedButton(Icons.add, setState, _fiveFlavor._bitterness, 1),
                         ],
                       ),
                       Row(
                         children: [
                           const Text('渋味'),
-                          roundRaisedButton(Icons.remove, setState, _astringent, -1),
-                          Text(_astringent.param.toString()),
-                          roundRaisedButton(Icons.add, setState, _astringent, 1),
+                          roundRaisedButton(Icons.remove, setState, _fiveFlavor._astringent, -1),
+                          Text(_fiveFlavor._astringent.param.toString()),
+                          roundRaisedButton(Icons.add, setState, _fiveFlavor._astringent, 1),
                         ],
                       ),
                     ], // コンテンツ
@@ -146,11 +170,13 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
             ),
             actions: <Widget>[
               TextButton(
-                onPressed: () => Navigator.pop(context, 'Cancel'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
                 child: const Text('Cancel'),
               ),
               TextButton(
-                onPressed: () => Navigator.pop(context, 'OK'),
+                onPressed: () => Navigator.pop(context, _fiveFlavor),
                 child: const Text('OK'),
               ),
             ],
@@ -253,14 +279,18 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
             RadarChartData(
               radarTouchData: RadarTouchData(
                   touchCallback: (FlTouchEvent event,
-                      response) {
+                      response) async {
                     if (!event.isInterestedForInteractions) {
                       setState(() {
                         selectedDataSetIndex = -1;
                       });
                       if (response != null) {
-                        // TODO:ダイアログで設定した結果が再度タップしないと反映されない
-                        showInputDialog(context);
+                        FiveFlavorParameter? returnParams = await showInputDialog(context, _fiveFlavorParameter);
+                        setState(() {
+                          if (returnParams != null) {
+                            _fiveFlavorParameter = returnParams;
+                          }
+                        });
                       }
                       return;
                     }
@@ -312,21 +342,4 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
       ],
     );
   }
-}
-
-class PrimitiveParameter {
-  int param;
-  PrimitiveParameter({required this.param});
-}
-
-class RawDataSet {
-  final String title;
-  final Color color;
-  final List<double> values;
-
-  RawDataSet({
-    required this.title,
-    required this.color,
-    required this.values,
-  });
 }

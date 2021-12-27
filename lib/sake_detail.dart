@@ -76,8 +76,6 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
   final TextEditingController _temperature = TextEditingController();
   final TextEditingController _drinking = TextEditingController();
 
-  int selectedDataSetIndex = -1;
-
   @override
   void initState() {
     if (widget.arguments != null) {
