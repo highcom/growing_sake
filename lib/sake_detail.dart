@@ -148,6 +148,13 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
     return future;
   }
 
+  void setFocusScope(BuildContext context) {
+    final FocusScopeNode currentScope = FocusScope.of(context);
+    if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
+      FocusManager.instance.primaryFocus!.unfocus();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<DocumentSnapshot>(
@@ -193,42 +200,43 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
               children: [
                 Container(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                  child: TextField(
-                    controller: _title,
-                    enabled: true,
-                    maxLines: 1,
-                    onTap: () {
-                      final FocusScopeNode currentScope = FocusScope.of(context);
-                      if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
-                        FocusManager.instance.primaryFocus!.unfocus();
-                      } else {
+                  child: GestureDetector(
+                    onTap: () => setFocusScope(context),
+                    child: TextField(
+                      controller: _title,
+                      enabled: true,
+                      maxLines: 1,
+                      onTap: () {
                         List<String> params = ['銘柄名', _title.text];
                         Navigator.of(context).pushNamed("/candidate_list", arguments: params).then((value) {
                           if (value != null) {
                             Map<String, String> result = value as Map<String, String>;
-                            if (result['brand'] != null) {
-                              _title.text = result['brand'] as String;
+                            _title.text = result['brand'] as String;
+                            if (result['brewery'] != '') {
                               _brewery.text = result['brewery'] as String;
+                            }
+                            if (result['area'] != '') {
                               _area.text = result['area'] as String;
                             }
                           }
+                          FocusManager.instance.primaryFocus!.unfocus();
                         });
-                      }
-                    },
-                    decoration: TextFieldDecoration('銘柄名'),
+                      },
+                      decoration: TextFieldDecoration('銘柄名'),
+                    ),
                   ),
                 ),
                 Container(
                   height: 45,
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                  child: TextField(
-                    controller: _subtitle,
-                    enabled: true,
-                    maxLines: 1,
-                    onChanged: (value) {
-                      setControllerValue(_subtitle, value);
-                    },
-                    decoration: TextFieldDecoration('サブ銘柄名'),
+                  child: GestureDetector(
+                    onTap: () => setFocusScope(context),
+                    child: TextField(
+                      controller: _subtitle,
+                      enabled: true,
+                      maxLines: 1,
+                      decoration: TextFieldDecoration('サブ銘柄名'),
+                    ),
                   ),
                 ),
                 Container(
@@ -265,26 +273,26 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                       ),
                       Container(
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                        child: TextField(
-                          controller: _brewery,
-                          enabled: true,
-                          maxLines: 1,
-                          onChanged: (value) {
-                            setControllerValue(_brewery, value);
-                          },
-                          decoration: TextFieldDecoration('酒舗'),
+                        child: GestureDetector(
+                          onTap: () => setFocusScope(context),
+                          child: TextField(
+                            controller: _brewery,
+                            enabled: true,
+                            maxLines: 1,
+                            decoration: TextFieldDecoration('酒舗'),
+                          ),
                         ),
                       ),
                       Container(
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                        child: TextField(
-                          controller: _area,
-                          enabled: true,
-                          maxLines: 1,
-                          onChanged: (value) {
-                            setControllerValue(_area, value);
-                          },
-                          decoration: TextFieldDecoration('地域'),
+                        child: GestureDetector(
+                          onTap: () => setFocusScope(context),
+                          child: TextField(
+                            controller: _area,
+                            enabled: true,
+                            maxLines: 1,
+                            decoration: TextFieldDecoration('地域'),
+                          ),
                         ),
                       ),
                       Container(
@@ -306,48 +314,48 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                       ),
                       Container(
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                        child: TextField(
-                          controller: _polishing,
-                          enabled: true,
-                          maxLines: 1,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [FilteringTextInputFormatter
-                              .digitsOnly
-                          ],
-                          onChanged: (value) {
-                            setControllerValue(_polishing, value);
-                          },
-                          decoration: TextFieldWithSuffixDecoration(
-                              '精米歩合', '％'),
+                        child: GestureDetector(
+                          onTap: () => setFocusScope(context),
+                          child: TextField(
+                            controller: _polishing,
+                            enabled: true,
+                            maxLines: 1,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [FilteringTextInputFormatter
+                                .digitsOnly
+                            ],
+                            decoration: TextFieldWithSuffixDecoration(
+                                '精米歩合', '％'),
+                          ),
                         ),
                       ),
                       Container(
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                        child: TextField(
-                          controller: _material,
-                          enabled: true,
-                          maxLines: 1,
-                          onChanged: (value) {
-                            setControllerValue(_material, value);
-                          },
-                          decoration: TextFieldDecoration('原材料'),
+                        child: GestureDetector(
+                          onTap: () => setFocusScope(context),
+                          child: TextField(
+                            controller: _material,
+                            enabled: true,
+                            maxLines: 1,
+                            decoration: TextFieldDecoration('原材料'),
+                          ),
                         ),
                       ),
                       Container(
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                        child: TextField(
-                          controller: _capacity,
-                          enabled: true,
-                          maxLines: 1,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [FilteringTextInputFormatter
-                              .digitsOnly
-                          ],
-                          onChanged: (value) {
-                            setControllerValue(_capacity, value);
-                          },
-                          decoration: TextFieldWithSuffixDecoration(
-                              '内容量', 'ml'),
+                        child: GestureDetector(
+                          onTap: () => setFocusScope(context),
+                          child: TextField(
+                            controller: _capacity,
+                            enabled: true,
+                            maxLines: 1,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [FilteringTextInputFormatter
+                                .digitsOnly
+                            ],
+                            decoration: TextFieldWithSuffixDecoration(
+                                '内容量', 'ml'),
+                          ),
                         ),
                       ),
                     ],
@@ -355,28 +363,28 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                 ),
                 Container(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                  child: TextField(
-                    controller: _purchase,
-                    enabled: true,
-                    maxLines: 1,
-                    onChanged: (value) {
-                      setControllerValue(_purchase, value);
-                    },
-                    decoration: TextFieldDecoration('購入日'),
+                  child: GestureDetector(
+                    onTap: () => setFocusScope(context),
+                    child: TextField(
+                      controller: _purchase,
+                      enabled: true,
+                      maxLines: 1,
+                      decoration: TextFieldDecoration('購入日'),
+                    ),
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                  child: TextField(
-                    controller: _temperature,
-                    enabled: true,
-                    maxLines: 1,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    onChanged: (value) {
-                      setControllerValue(_temperature, value);
-                    },
-                    decoration: TextFieldWithSuffixDecoration('保管温度', '度'),
+                  child: GestureDetector(
+                    onTap: () => setFocusScope(context),
+                    child: TextField(
+                      controller: _temperature,
+                      enabled: true,
+                      maxLines: 1,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      decoration: TextFieldWithSuffixDecoration('保管温度', '度'),
+                    ),
                   ),
                 ),
                 Container(

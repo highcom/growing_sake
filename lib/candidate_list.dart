@@ -18,6 +18,8 @@ class CandidateListWidget extends StatefulWidget {
 }
 
 class _CandidateListState extends State<CandidateListWidget> {
+  final _focusNode = FocusNode();
+
   List<String> _defaultParams = [];
   List<Brand> allBrands = [];
   List<Brand> searchBrands = [];
@@ -80,39 +82,60 @@ class _CandidateListState extends State<CandidateListWidget> {
     _defaultParams = widget.arguments;
     _title = _defaultParams[0];
     _nameController!.text = _defaultParams[1];
+    result['brand'] = '';
+    result['brewery'] = '';
+    result['area'] = '';
+    _focusNode.addListener(() {
+      if (!_focusNode.hasFocus) {
+        result['brand'] = _nameController!.text;
+        Navigator.of(context).pop(result);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+    onWillPop: () async {
+      // フォーカスを外す方でpopするので戻るボタンは無効化する
+      _focusNode.unfocus();
+      return false;
+    },
+    child: Scaffold(
       appBar: AppBar(
         title: const Text('Sake Detail'),
         automaticallyImplyLeading: true,
-        actions: [
-          IconButton(onPressed: () {Navigator.of(context).pop(result);}, icon: const Icon(Icons.check)),
-        ],
       ),
       body: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
-            child: TextField(
-              enabled: true,
-              maxLines: 1,
-              controller: _nameController,
-              onChanged: (value) {
-                _runFilter(value);
+            child: GestureDetector(
+              onTap: () {
+                final FocusScopeNode currentScope = FocusScope.of(context);
+                if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
+                  FocusManager.instance.primaryFocus!.unfocus();
+                }
               },
-              decoration: InputDecoration(
-                labelText: _title,
-                floatingLabelBehavior: FloatingLabelBehavior.auto,
-                filled: true,
-                fillColor: AppThemeColor.baseColor.shade50,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
+              child: TextField(
+                enabled: true,
+                autofocus: true,
+                maxLines: 1,
+                focusNode: _focusNode,
+                controller: _nameController,
+                onChanged: (value) {
+                  _runFilter(value);
+                },
+                decoration: InputDecoration(
+                  labelText: _title,
+                  floatingLabelBehavior: FloatingLabelBehavior.auto,
+                  filled: true,
+                  fillColor: AppThemeColor.baseColor.shade50,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
-
               ),
             ),
           ),
@@ -138,13 +161,14 @@ class _CandidateListState extends State<CandidateListWidget> {
           ),
         ],
       ),
+    ),
     );
   }
 
   Widget _candidateItem(Brand brand) {
     return Container(
       decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(width: 1.0, color: Colors.grey))
+        border: Border(bottom: BorderSide(width: 1.0, color: Colors.grey))
       ),
       child:ListTile(
         title: Text(
@@ -174,5 +198,11 @@ class _CandidateListState extends State<CandidateListWidget> {
         }, // タップ
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
   }
 }
