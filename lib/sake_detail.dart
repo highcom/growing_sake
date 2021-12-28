@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/services.dart';
 import 'package:growing_sake/app_theme_color.dart';
 import 'package:growing_sake/sake_line_chart.dart';
 import 'package:growing_sake/sake_radar_chart.dart';
-import 'package:growing_sake/candidate_list.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 class SakeDetailWidget extends StatefulWidget {
   final arguments;
@@ -64,6 +64,7 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
   late AnimationController _controller;
   IconData _iconData = Icons.add;
 
+  late DateTime _purchaseDateTime;
   final TextEditingController _title = TextEditingController();
   final TextEditingController _subtitle = TextEditingController();
   final TextEditingController _brewery = TextEditingController();
@@ -87,6 +88,8 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
+    Intl.defaultLocale = 'ja_JP';
+    initializeDateFormatting();
     super.initState();
   }
 
@@ -137,10 +140,11 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
       _material.text = snapshot.get('material');
       _capacity.text = snapshot.get('capacity').toString();
       if (docId != null) {
-        _purchase.text = snapshot.get('purchase').toDate().toString();
+        _purchaseDateTime = snapshot.get('purchase').toDate();
       } else {
-        _purchase.text = DateTime.now().toString();
+        _purchaseDateTime = DateTime.now();
       }
+      _purchase.text = (DateFormat.yMMMEd()).format(_purchaseDateTime);
       _temperature.text = snapshot.get('temperature').toString();
       _drinking.text = snapshot.get('drinking');
       firstTime = false;
@@ -152,6 +156,21 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
     final FocusScopeNode currentScope = FocusScope.of(context);
     if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
       FocusManager.instance.primaryFocus!.unfocus();
+    }
+  }
+
+  Future<void> selectDate(BuildContext context) async {
+    final DateTime? selected = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2050),
+    );
+    if (selected != null) {
+      setState(() {
+        _purchaseDateTime = selected;
+        _purchase.text = (DateFormat.yMMMEd()).format(_purchaseDateTime);
+      });
     }
   }
 
@@ -185,7 +204,7 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                         'polishing': _polishing.text,
                         'material': _material.text,
                         'capacity': _capacity.text,
-                        'purchase': DateTime.parse(_purchase.text),
+                        'purchase': _purchaseDateTime,
                         'temperature': _temperature.text,
                         'drinking': _drinking.text,
                       });
@@ -368,7 +387,9 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                     child: TextField(
                       controller: _purchase,
                       enabled: true,
+                      readOnly: true,
                       maxLines: 1,
+                      onTap: () => selectDate(context),
                       decoration: TextFieldDecoration('購入日'),
                     ),
                   ),
