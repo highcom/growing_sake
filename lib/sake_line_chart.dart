@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:growing_sake/app_theme_color.dart';
+import 'package:numberpicker/numberpicker.dart';
 
 class SakeLineChart extends StatefulWidget {
   const SakeLineChart({Key? key}) : super(key: key);
@@ -13,6 +17,42 @@ class _SakeLineChartState extends State<SakeLineChart> {
     const Color(0xff23b6e6),
     const Color(0xff02d39a),
   ];
+
+  List<FlSpot> aromaDataList = [];
+  late DateTime _selectDateTime;
+  final TextEditingController _selectDate = TextEditingController();
+  int _currentDate = 0;
+  int _currentAromaLevel = 1;
+
+  @override
+  void initState() {
+    Intl.defaultLocale = 'ja_JP';
+    initializeDateFormatting();
+    // aromaDataList.add(const FlSpot(0, 3));
+    super.initState();
+  }
+
+  void setFocusScope(BuildContext context) {
+    final FocusScopeNode currentScope = FocusScope.of(context);
+    if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
+      FocusManager.instance.primaryFocus!.unfocus();
+    }
+  }
+
+  Future<void> selectDate(BuildContext context) async {
+    final DateTime? selected = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2050),
+    );
+    if (selected != null) {
+      setState(() {
+        _selectDateTime = selected;
+        _selectDate.text = (DateFormat.yMd()).format(_selectDateTime);
+      });
+    }
+  }
 
   LineChartData mainData() {
     return LineChartData(
@@ -89,15 +129,7 @@ class _SakeLineChartState extends State<SakeLineChart> {
       maxY: 6,
       lineBarsData: [
         LineChartBarData(
-          spots: const [
-            FlSpot(0, 3),
-            FlSpot(2.6, 2),
-            FlSpot(4.9, 5),
-            FlSpot(6.8, 3.1),
-            FlSpot(8, 4),
-            FlSpot(9.5, 3),
-            FlSpot(11, 4),
-          ],
+          spots: aromaDataList,
           isCurved: true,
           colors: gradientColors,
           barWidth: 5,
@@ -117,24 +149,95 @@ class _SakeLineChartState extends State<SakeLineChart> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        AspectRatio(
-          aspectRatio: 1.70,
-          child: Container(
-            decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(18),
-                ),
-                color: Color(0xff232d37)),
-            child: Padding(
-              padding: const EdgeInsets.only(
-                  right: 18.0, left: 12.0, top: 24, bottom: 12),
-              child: LineChart(mainData()),
-            ),
+    return Container(
+      decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(
+            Radius.circular(18),
           ),
-        ),
-      ],
+          color: Color(0xffa9c6fd)),
+      child: Column(
+        children: [
+          // TODO:入力する時だけ表示するように切り替える機能を追加する
+          Row(
+            children: [
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+                  child: GestureDetector(
+                    onTap: () => setFocusScope(context),
+                    child: TextField(
+                      controller: _selectDate,
+                      enabled: true,
+                      readOnly: true,
+                      maxLines: 1,
+                      onTap: () => selectDate(context),
+                      decoration: TextFieldDecoration('日付'),
+                    ),
+                  ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(12, 0, 0, 0),
+                child: Text('香り'),
+              ),
+              NumberPicker(
+                itemHeight: 40,
+                itemWidth: 50,
+                value: _currentAromaLevel,
+                minValue: 0,
+                maxValue: 10,
+                onChanged: (value) => setState(() => _currentAromaLevel = value),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 12, 0),
+                child: RaisedButton(
+                  child: const Text('追加'),
+                  color: AppThemeColor.baseColor.shade50,
+                  shape: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  onPressed: () {
+                    aromaDataList.add(FlSpot(_currentDate.toDouble(), _currentAromaLevel.toDouble()));
+                    // TODO:日付の初期位置からの相対位置を計算する
+                    _currentDate++;
+                  },
+                ),
+              ),
+            ],
+          ),
+          Stack(
+            children: <Widget>[
+              AspectRatio(
+                aspectRatio: 1.70,
+                child: Container(
+                  decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(18),
+                      ),
+                      color: Color(0xffa9c6fd)),
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        right: 18.0, left: 12.0, top: 24, bottom: 12),
+                    child: LineChart(mainData()),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
+}
+
+class TextFieldDecoration extends InputDecoration {
+  TextFieldDecoration(String text) : super(
+    labelText: text,
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+    filled: true,
+    fillColor: AppThemeColor.baseColor.shade50,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+    ),
+  );
 }
