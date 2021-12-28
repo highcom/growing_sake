@@ -193,9 +193,13 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
               IconButton(
                 icon: const Icon(Icons.check),
                 onPressed: () async {
-                  await FirebaseFirestore.instance.collection('Brands')
-                      .doc()
-                      .set({
+                  DocumentReference docRef;
+                  if (docId != null) {
+                    docRef = FirebaseFirestore.instance.collection('Brands').doc(docId);
+                  } else {
+                    docRef = FirebaseFirestore.instance.collection('Brands').doc();
+                  }
+                  await docRef.set({
                         'title': _title.text,
                         'subtitle': _subtitle.text,
                         'brewery': _brewery.text,
