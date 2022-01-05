@@ -12,11 +12,15 @@ class SakeLineChart extends StatefulWidget {
   State<StatefulWidget> createState() => _SakeLineChartState();
 }
 
-class _SakeLineChartState extends State<SakeLineChart> {
+class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProviderStateMixin {
   List<Color> gradientColors = [
     const Color(0xff23b6e6),
     const Color(0xff02d39a),
   ];
+
+  bool showPicker = false;
+  late AnimationController _controller;
+  IconData _iconData = Icons.add;
 
   List<FlSpot> aromaDataList = [];
   late DateTime _selectDateTime;
@@ -28,8 +32,25 @@ class _SakeLineChartState extends State<SakeLineChart> {
   void initState() {
     Intl.defaultLocale = 'ja_JP';
     initializeDateFormatting();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
     // aromaDataList.add(const FlSpot(0, 3));
     super.initState();
+  }
+
+  void _handleVisible() {
+    setState(() {
+      showPicker = !showPicker;
+      if (showPicker) {
+        _controller.forward();
+        _iconData = Icons.remove;
+      } else {
+        _controller.reverse();
+        _iconData = Icons.add;
+      }
+    });
   }
 
   void setFocusScope(BuildContext context) {
@@ -157,53 +178,75 @@ class _SakeLineChartState extends State<SakeLineChart> {
           color: Color(0xffa9c6fd)),
       child: Column(
         children: [
-          // TODO:入力する時だけ表示するように切り替える機能を追加する
-          Row(
-            children: [
-              Flexible(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
-                  child: GestureDetector(
-                    onTap: () => setFocusScope(context),
-                    child: TextField(
-                      controller: _selectDate,
-                      enabled: true,
-                      readOnly: true,
-                      maxLines: 1,
-                      onTap: () => selectDate(context),
-                      decoration: TextFieldDecoration('日付'),
+          Container(
+            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+            alignment: Alignment.centerLeft,
+            child: ButtonTheme(
+              child: OutlineButton.icon(
+                color: AppThemeColor.baseColor,
+                icon: Icon(_iconData,
+                  color: AppThemeColor.baseColor,
+                ),
+                label: const Text('データ入力',
+                  style: TextStyle(color: AppThemeColor.baseColor),
+                ),
+                shape: const OutlineInputBorder(
+                  borderSide: BorderSide(color: AppThemeColor.baseColor),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
+                onPressed: _handleVisible,
+              ),
+            ),
+          ),
+          SizeTransition(
+            sizeFactor: _controller,
+            child: Row(
+              children: [
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+                    child: GestureDetector(
+                      onTap: () => setFocusScope(context),
+                      child: TextField(
+                        controller: _selectDate,
+                        enabled: true,
+                        readOnly: true,
+                        maxLines: 1,
+                        onTap: () => selectDate(context),
+                        decoration: TextFieldDecoration('日付'),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(12, 0, 0, 0),
-                child: Text('香り'),
-              ),
-              NumberPicker(
-                itemHeight: 40,
-                itemWidth: 50,
-                value: _currentAromaLevel,
-                minValue: 0,
-                maxValue: 10,
-                onChanged: (value) => setState(() => _currentAromaLevel = value),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(0, 0, 12, 0),
-                child: RaisedButton(
-                  child: const Text('追加'),
-                  color: AppThemeColor.baseColor.shade50,
-                  shape: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
-                  onPressed: () {
-                    aromaDataList.add(FlSpot(_currentDate.toDouble(), _currentAromaLevel.toDouble()));
-                    // TODO:日付の初期位置からの相対位置を計算する
-                    _currentDate++;
-                  },
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(12, 0, 0, 0),
+                  child: Text('香り'),
                 ),
-              ),
-            ],
+                NumberPicker(
+                  itemHeight: 40,
+                  itemWidth: 50,
+                  value: _currentAromaLevel,
+                  minValue: 0,
+                  maxValue: 10,
+                  onChanged: (value) => setState(() => _currentAromaLevel = value),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 12, 0),
+                  child: RaisedButton(
+                    child: const Text('追加'),
+                    color: AppThemeColor.baseColor.shade50,
+                    shape: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    onPressed: () {
+                      aromaDataList.add(FlSpot(_currentDate.toDouble(), _currentAromaLevel.toDouble()));
+                      // TODO:日付の初期位置からの相対位置を計算する
+                      _currentDate++;
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
           Stack(
             children: <Widget>[
