@@ -25,7 +25,9 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
   List<FlSpot> aromaDataList = [];
   late DateTime _selectDateTime;
   final TextEditingController _selectDate = TextEditingController();
-  int _currentDate = 0;
+  double _currentDate = 0;
+  double _startDate = 0;
+  double _endDate = 0;
   int _currentAromaLevel = 1;
 
   @override
@@ -106,17 +108,16 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
               fontWeight: FontWeight.bold,
               fontSize: 16),
           getTitles: (value) {
-            switch (value.toInt()) {
-              case 2:
-                return 'MAR';
-              case 5:
-                return 'JUN';
-              case 8:
-                return 'SEP';
+            for (var item in aromaDataList) {
+              if (item.x == value) {
+                DateTime time = DateTime.fromMillisecondsSinceEpoch((value * (1000 * 60 * 60 * 24)).toInt());
+                return time.month.toString() + "/" + time.day.toString();
+              }
             }
-            return '';
+            return "";
           },
           margin: 8,
+          rotateAngle: 60.0,
         ),
         leftTitles: SideTitles(
           showTitles: true,
@@ -128,12 +129,12 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
           ),
           getTitles: (value) {
             switch (value.toInt()) {
-              case 1:
-                return '10k';
-              case 3:
-                return '30k';
+              case 0:
+                return '0';
               case 5:
-                return '50k';
+                return '5';
+              case 10:
+                return '10';
             }
             return '';
           },
@@ -144,10 +145,10 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
       borderData: FlBorderData(
           show: true,
           border: Border.all(color: const Color(0xff37434d), width: 1)),
-      minX: 0,
-      maxX: 11,
+      minX: _startDate,
+      maxX: _endDate,
       minY: 0,
-      maxY: 6,
+      maxY: 10,
       lineBarsData: [
         LineChartBarData(
           spots: aromaDataList,
@@ -239,9 +240,20 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
                     onPressed: () {
-                      aromaDataList.add(FlSpot(_currentDate.toDouble(), _currentAromaLevel.toDouble()));
-                      // TODO:日付の初期位置からの相対位置を計算する
-                      _currentDate++;
+                      setState(() {
+                        _currentDate = _selectDateTime.millisecondsSinceEpoch / (1000 * 60 * 60 * 24);
+                        if (_startDate == 0) _startDate = _currentDate;
+                        for (var aroma in aromaDataList) {
+                          // 同じ日付があった場合には一度削除してから登録し直す
+                          if (aroma.x == _currentDate) {
+                            aromaDataList.remove(aroma);
+                            break;
+                          }
+                        }
+                        aromaDataList.add(FlSpot(_currentDate, _currentAromaLevel.toDouble()));
+                        aromaDataList.sort((left, right) => left.x.compareTo(right.x));
+                        _endDate = aromaDataList.last.x;
+                      });
                     },
                   ),
                 ),
