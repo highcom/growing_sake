@@ -71,9 +71,9 @@ class _GrowingSakeWidgetState extends State<GrowingSakeWidget> {
       body: _pageWidgets.elementAt(_currentIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), title: Text('Home')),
-          BottomNavigationBarItem(icon: Icon(Icons.timeline), title: Text('Timeline')),
-          BottomNavigationBarItem(icon: Icon(Icons.menu), title: Text('Menu')),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.timeline), label: 'Timeline'),
+          BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Menu'),
         ],
         currentIndex: _currentIndex,
         fixedColor: AppThemeColor.baseColor,
