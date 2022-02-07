@@ -6,10 +6,19 @@ import 'package:growing_sake/app_theme_color.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 class SakeLineChart extends StatefulWidget {
-  const SakeLineChart({Key? key}) : super(key: key);
+  final List<FlSpot> aromaDataList = [];
+
+  SakeLineChart({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _SakeLineChartState();
+
+  void setAromaData(List<double> elapsedList, List<double> levelList) {
+    for (int i = 0; i < elapsedList.length; i++) {
+      FlSpot data = FlSpot(elapsedList[i], levelList[i]);
+      aromaDataList.add(data);
+    }
+  }
 }
 
 class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProviderStateMixin {
@@ -22,7 +31,6 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
   late AnimationController _controller;
   IconData _iconData = Icons.add;
 
-  List<FlSpot> aromaDataList = [];
   late DateTime _selectDateTime;
   final TextEditingController _selectDate = TextEditingController();
   double _currentDate = 0;
@@ -38,7 +46,6 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-    // aromaDataList.add(const FlSpot(0, 3));
     super.initState();
   }
 
@@ -108,7 +115,7 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
               fontWeight: FontWeight.bold,
               fontSize: 16),
           getTitles: (value) {
-            for (var item in aromaDataList) {
+            for (var item in widget.aromaDataList) {
               if (item.x == value) {
                 DateTime time = DateTime.fromMillisecondsSinceEpoch((value * (1000 * 60 * 60 * 24)).toInt());
                 return time.month.toString() + "/" + time.day.toString();
@@ -151,7 +158,7 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
       maxY: 10,
       lineBarsData: [
         LineChartBarData(
-          spots: aromaDataList,
+          spots: widget.aromaDataList,
           isCurved: true,
           colors: gradientColors,
           barWidth: 5,
@@ -243,16 +250,16 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
                       setState(() {
                         _currentDate = _selectDateTime.millisecondsSinceEpoch / (1000 * 60 * 60 * 24);
                         if (_startDate == 0) _startDate = _currentDate;
-                        for (var aroma in aromaDataList) {
+                        for (var aroma in widget.aromaDataList) {
                           // 同じ日付があった場合には一度削除してから登録し直す
                           if (aroma.x == _currentDate) {
-                            aromaDataList.remove(aroma);
+                            widget.aromaDataList.remove(aroma);
                             break;
                           }
                         }
-                        aromaDataList.add(FlSpot(_currentDate, _currentAromaLevel.toDouble()));
-                        aromaDataList.sort((left, right) => left.x.compareTo(right.x));
-                        _endDate = aromaDataList.last.x;
+                        widget.aromaDataList.add(FlSpot(_currentDate, _currentAromaLevel.toDouble()));
+                        widget.aromaDataList.sort((left, right) => left.x.compareTo(right.x));
+                        _endDate = widget.aromaDataList.last.x;
                       });
                     },
                   ),

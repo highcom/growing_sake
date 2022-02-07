@@ -64,6 +64,8 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
   late AnimationController _controller;
   IconData _iconData = Icons.add;
 
+  final SakeLineChart _sakeLineChart = SakeLineChart();
+
   late DateTime _purchaseDateTime;
   final TextEditingController _title = TextEditingController();
   final TextEditingController _subtitle = TextEditingController();
@@ -131,22 +133,29 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
     }
     DocumentSnapshot snapshot = await future;
     if (firstTime == true) {
-      _title.text = snapshot.get('title');
-      _subtitle.text = snapshot.get('subtitle');
-      _brewery.text = snapshot.get('brewery');
-      _area.text = snapshot.get('area');
-      _specific.text = snapshot.get('specific');
-      _polishing.text = snapshot.get('polishing').toString();
-      _material.text = snapshot.get('material');
-      _capacity.text = snapshot.get('capacity').toString();
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+      _title.text = data['title'] as String;
+      _subtitle.text = data['subtitle'] as String;
+      _brewery.text = data['brewery'] as String;
+      _area.text = data['area'] as String;
+      _specific.text = data['specific'] as String;
+      _polishing.text = data['polishing'].toString();
+      _material.text = data['material'] as String;
+      _capacity.text = data['capacity'].toString();
       if (docId != null) {
-        _purchaseDateTime = snapshot.get('purchase').toDate();
+        _purchaseDateTime = data['purchase'].toDate();
       } else {
         _purchaseDateTime = DateTime.now();
       }
       _purchase.text = (DateFormat.yMMMEd()).format(_purchaseDateTime);
-      _temperature.text = snapshot.get('temperature').toString();
-      _drinking.text = snapshot.get('drinking');
+      _temperature.text = data['temperature'].toString();
+      _drinking.text = data['drinking'] as String;
+      if (data.containsKey('aromaElapsedList') && data.containsKey('aromaLevelList')) {
+        _sakeLineChart.setAromaData(
+            data['aromaElapsedList'].cast<double>() as List<double>,
+            data['aromaLevelList'].cast<double>() as List<double>);
+      }
+
       firstTime = false;
     }
     return future;
@@ -199,6 +208,14 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                   } else {
                     docRef = FirebaseFirestore.instance.collection('Brands').doc();
                   }
+
+                  List<double> _aromaElapsedList = [];
+                  List<double> _aromaLevelList = [];
+                  for (var aroma in _sakeLineChart.aromaDataList) {
+                    _aromaElapsedList.add(aroma.x);
+                    _aromaLevelList.add(aroma.y);
+                  }
+
                   await docRef.set({
                         'title': _title.text,
                         'subtitle': _subtitle.text,
@@ -211,7 +228,9 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                         'purchase': _purchaseDateTime,
                         'temperature': _temperature.text,
                         'drinking': _drinking.text,
-                      });
+                        'aromaElapsedList': FieldValue.arrayUnion(_aromaElapsedList),
+                        'aromaLevelList': FieldValue.arrayUnion(_aromaLevelList),
+                  });
                   Navigator.of(context).pop();
                 },
               ),
@@ -431,7 +450,7 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                 ),
                 Container(
                   padding: const EdgeInsets.all(8),
-                  child: const SakeLineChart(),
+                  child: _sakeLineChart,
                 )
               ],
             ),
