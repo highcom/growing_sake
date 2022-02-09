@@ -6,19 +6,14 @@ import 'package:growing_sake/app_theme_color.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 class SakeLineChart extends StatefulWidget {
+  final List<double> elapsedList;
+  final List<double> levelList;
   final List<FlSpot> aromaDataList = [];
 
-  SakeLineChart({Key? key}) : super(key: key);
+  SakeLineChart({Key? key, required this.elapsedList, required this.levelList}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _SakeLineChartState();
-
-  void setAromaData(List<double> elapsedList, List<double> levelList) {
-    for (int i = 0; i < elapsedList.length; i++) {
-      FlSpot data = FlSpot(elapsedList[i], levelList[i]);
-      aromaDataList.add(data);
-    }
-  }
 }
 
 class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProviderStateMixin {
@@ -46,6 +41,19 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
+
+    setState(() {
+      for (int i = 0; i < widget.elapsedList.length && i < widget.levelList.length; i++) {
+        FlSpot data = FlSpot(widget.elapsedList[i], widget.levelList[i]);
+        widget.aromaDataList.add(data);
+      }
+      if (widget.elapsedList.isNotEmpty && widget.levelList.isNotEmpty) {
+        widget.aromaDataList.sort((left, right) => left.x.compareTo(right.x));
+        _startDate = widget.aromaDataList.first.x;
+        _endDate = widget.aromaDataList.last.x;
+      }
+    });
+
     super.initState();
   }
 

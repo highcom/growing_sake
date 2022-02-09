@@ -64,7 +64,7 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
   late AnimationController _controller;
   IconData _iconData = Icons.add;
 
-  final SakeLineChart _sakeLineChart = SakeLineChart();
+  late SakeLineChart _sakeLineChart;
 
   late DateTime _purchaseDateTime;
   final TextEditingController _title = TextEditingController();
@@ -151,9 +151,11 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
       _temperature.text = data['temperature'].toString();
       _drinking.text = data['drinking'] as String;
       if (data.containsKey('aromaElapsedList') && data.containsKey('aromaLevelList')) {
-        _sakeLineChart.setAromaData(
-            data['aromaElapsedList'].cast<double>() as List<double>,
-            data['aromaLevelList'].cast<double>() as List<double>);
+        _sakeLineChart = SakeLineChart(
+            elapsedList: data['aromaElapsedList'].cast<double>() as List<double>,
+            levelList: data['aromaLevelList'].cast<double>() as List<double>);
+      } else {
+        _sakeLineChart = SakeLineChart(elapsedList: const [], levelList: const []);
       }
 
       firstTime = false;
