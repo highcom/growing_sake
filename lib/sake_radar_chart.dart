@@ -6,7 +6,10 @@ const baseColor = Color(0x44afafaf);
 
 class SakeRadarChart extends StatefulWidget {
   final String title;
-  const SakeRadarChart({Key? key, required this.title}) : super(key: key);
+  final Map<String, int> fiveFlavorList;
+  final FiveFlavorParameter fiveFlavorParameter = FiveFlavorParameter();
+
+  SakeRadarChart({Key? key, required this.title, required this.fiveFlavorList}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _SakeRadarChartState();
@@ -21,11 +24,11 @@ class PrimitiveParameter {
 }
 
 class FiveFlavorParameter {
-  final PrimitiveParameter _sweetness = PrimitiveParameter(param: 3);
-  final PrimitiveParameter _sourness = PrimitiveParameter(param: 3);
-  final PrimitiveParameter _pungent = PrimitiveParameter(param: 3);
-  final PrimitiveParameter _bitterness = PrimitiveParameter(param: 3);
-  final PrimitiveParameter _astringent = PrimitiveParameter(param: 3);
+  final PrimitiveParameter sweetness = PrimitiveParameter(param: 3);
+  final PrimitiveParameter sourness = PrimitiveParameter(param: 3);
+  final PrimitiveParameter pungent = PrimitiveParameter(param: 3);
+  final PrimitiveParameter bitterness = PrimitiveParameter(param: 3);
+  final PrimitiveParameter astringent = PrimitiveParameter(param: 3);
 }
 
 class RawDataSet {
@@ -44,7 +47,27 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
 
   int selectedDataSetIndex = -1;
 
-  FiveFlavorParameter _fiveFlavorParameter = FiveFlavorParameter();
+  @override
+  void initState() {
+    setState(() {
+      if (widget.fiveFlavorList.containsKey('sweetness')) {
+        widget.fiveFlavorParameter.sweetness.param = widget.fiveFlavorList['sweetness']!;
+      }
+      if (widget.fiveFlavorList.containsKey('sourness')) {
+        widget.fiveFlavorParameter.sourness.param = widget.fiveFlavorList['sourness']!;
+      }
+      if (widget.fiveFlavorList.containsKey('pungent')) {
+        widget.fiveFlavorParameter.pungent.param = widget.fiveFlavorList['pungent']!;
+      }
+      if (widget.fiveFlavorList.containsKey('bitterness')) {
+        widget.fiveFlavorParameter.bitterness.param = widget.fiveFlavorList['bitterness']!;
+      }
+      if (widget.fiveFlavorList.containsKey('astringent')) {
+        widget.fiveFlavorParameter.astringent.param = widget.fiveFlavorList['astringent']!;
+      }
+    });
+    super.initState();
+  }
 
   List<RadarDataSet> showingDataSets(int selectedDataSetIndex) {
     return rawDataSets().asMap().entries.map((entry) {
@@ -77,11 +100,11 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
         title: widget.title,
         color: artColor,
         values: [
-          _fiveFlavorParameter._sweetness.param.toDouble(),
-          _fiveFlavorParameter._sourness.param.toDouble(),
-          _fiveFlavorParameter._pungent.param.toDouble(),
-          _fiveFlavorParameter._bitterness.param.toDouble(),
-          _fiveFlavorParameter._astringent.param.toDouble(),
+          widget.fiveFlavorParameter.sweetness.param.toDouble(),
+          widget.fiveFlavorParameter.sourness.param.toDouble(),
+          widget.fiveFlavorParameter.pungent.param.toDouble(),
+          widget.fiveFlavorParameter.bitterness.param.toDouble(),
+          widget.fiveFlavorParameter.astringent.param.toDouble(),
         ],
       ),
       RawDataSet(
@@ -148,41 +171,41 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
                       Row(
                         children: [
                           const Text('甘味'),
-                          roundRaisedButton(Icons.remove, setState, _fiveFlavor._sweetness, -1),
-                          Text(_fiveFlavor._sweetness.param.toString()),
-                          roundRaisedButton(Icons.add, setState, _fiveFlavor._sweetness, 1),
+                          roundRaisedButton(Icons.remove, setState, _fiveFlavor.sweetness, -1),
+                          Text(_fiveFlavor.sweetness.param.toString()),
+                          roundRaisedButton(Icons.add, setState, _fiveFlavor.sweetness, 1),
                         ],
                       ),
                       Row(
                         children: [
                           const Text('酸味'),
-                          roundRaisedButton(Icons.remove, setState, _fiveFlavor._sourness, -1),
-                          Text(_fiveFlavor._sourness.param.toString()),
-                          roundRaisedButton(Icons.add, setState, _fiveFlavor._sourness, 1),
+                          roundRaisedButton(Icons.remove, setState, _fiveFlavor.sourness, -1),
+                          Text(_fiveFlavor.sourness.param.toString()),
+                          roundRaisedButton(Icons.add, setState, _fiveFlavor.sourness, 1),
                         ],
                       ),
                       Row(
                         children: [
                           const Text('辛味'),
-                          roundRaisedButton(Icons.remove, setState, _fiveFlavor._pungent, -1),
-                          Text(_fiveFlavor._pungent.param.toString()),
-                          roundRaisedButton(Icons.add, setState, _fiveFlavor._pungent, 1),
+                          roundRaisedButton(Icons.remove, setState, _fiveFlavor.pungent, -1),
+                          Text(_fiveFlavor.pungent.param.toString()),
+                          roundRaisedButton(Icons.add, setState, _fiveFlavor.pungent, 1),
                         ],
                       ),
                       Row(
                         children: [
                           const Text('苦味'),
-                          roundRaisedButton(Icons.remove, setState, _fiveFlavor._bitterness, -1),
-                          Text(_fiveFlavor._bitterness.param.toString()),
-                          roundRaisedButton(Icons.add, setState, _fiveFlavor._bitterness, 1),
+                          roundRaisedButton(Icons.remove, setState, _fiveFlavor.bitterness, -1),
+                          Text(_fiveFlavor.bitterness.param.toString()),
+                          roundRaisedButton(Icons.add, setState, _fiveFlavor.bitterness, 1),
                         ],
                       ),
                       Row(
                         children: [
                           const Text('渋味'),
-                          roundRaisedButton(Icons.remove, setState, _fiveFlavor._astringent, -1),
-                          Text(_fiveFlavor._astringent.param.toString()),
-                          roundRaisedButton(Icons.add, setState, _fiveFlavor._astringent, 1),
+                          roundRaisedButton(Icons.remove, setState, _fiveFlavor.astringent, -1),
+                          Text(_fiveFlavor.astringent.param.toString()),
+                          roundRaisedButton(Icons.add, setState, _fiveFlavor.astringent, 1),
                         ],
                       ),
                     ], // コンテンツ
@@ -307,10 +330,14 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
                         selectedDataSetIndex = -1;
                       });
                       if (response != null) {
-                        FiveFlavorParameter? returnParams = await showInputDialog(context, _fiveFlavorParameter);
+                        FiveFlavorParameter? returnParams = await showInputDialog(context, widget.fiveFlavorParameter);
                         setState(() {
                           if (returnParams != null) {
-                            _fiveFlavorParameter = returnParams;
+                            widget.fiveFlavorParameter.sweetness.param = returnParams.sweetness.param;
+                            widget.fiveFlavorParameter.sourness.param = returnParams.sourness.param;
+                            widget.fiveFlavorParameter.pungent.param = returnParams.pungent.param;
+                            widget.fiveFlavorParameter.bitterness.param = returnParams.bitterness.param;
+                            widget.fiveFlavorParameter.astringent.param = returnParams.astringent.param;
                           }
                         });
                       }

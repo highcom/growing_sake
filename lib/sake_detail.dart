@@ -65,6 +65,7 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
   IconData _iconData = Icons.add;
 
   late SakeLineChart _sakeLineChart;
+  late SakeRadarChart _sakeRadarChart;
 
   late DateTime _purchaseDateTime;
   final TextEditingController _title = TextEditingController();
@@ -158,6 +159,12 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
         _sakeLineChart = SakeLineChart(elapsedList: const [], levelList: const []);
       }
 
+      if (data.containsKey('fiveFlavorList')) {
+        _sakeRadarChart = SakeRadarChart(title: _title.text, fiveFlavorList: data['fiveFlavorList'].cast<String, int>() as Map<String, int>);
+      } else {
+        _sakeRadarChart = SakeRadarChart(title: _title.text, fiveFlavorList: const {});
+      }
+
       firstTime = false;
     }
     return future;
@@ -211,6 +218,14 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                     docRef = FirebaseFirestore.instance.collection('Brands').doc();
                   }
 
+                  var _fiveFlavorList = <String, int>{
+                    'sweetness': _sakeRadarChart.fiveFlavorParameter.sweetness.param,
+                    'sourness': _sakeRadarChart.fiveFlavorParameter.sourness.param,
+                    'pungent': _sakeRadarChart.fiveFlavorParameter.pungent.param,
+                    'bitterness': _sakeRadarChart.fiveFlavorParameter.bitterness.param,
+                    'astringent': _sakeRadarChart.fiveFlavorParameter.astringent.param,
+                  };
+
                   List<double> _aromaElapsedList = [];
                   List<double> _aromaLevelList = [];
                   for (var aroma in _sakeLineChart.aromaDataList) {
@@ -230,6 +245,7 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                         'purchase': _purchaseDateTime,
                         'temperature': _temperature.text,
                         'drinking': _drinking.text,
+                        'fiveFlavorList': _fiveFlavorList,
                         'aromaElapsedList': FieldValue.arrayUnion(_aromaElapsedList),
                         'aromaLevelList': FieldValue.arrayUnion(_aromaLevelList),
                   });
@@ -313,7 +329,7 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: SakeRadarChart(title: _title.text),
+                        child: _sakeRadarChart,
                       ),
                       Container(
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
