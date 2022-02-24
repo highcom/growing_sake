@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+///
+/// 日本酒一覧表示画面
+/// Firestoreから自分が登録した日本酒を取得して一覧で表示する
+///
 class SakeHomeViewWidget extends StatelessWidget {
   final Color color;
   final String title;
@@ -15,6 +19,7 @@ class SakeHomeViewWidget extends StatelessWidget {
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection('Brands').snapshots(),
         builder: (BuildContext context,
+          // データ取得中は処理中のプログレスを表示
           AsyncSnapshot<QuerySnapshot> snapshot) {
           if (!snapshot.hasData) {
             return const Center(
@@ -22,6 +27,9 @@ class SakeHomeViewWidget extends StatelessWidget {
             );
           }
 
+          ///
+          /// Firestoreから取得したデータをGグリッド表示で並べる
+          ///
           return GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
@@ -31,6 +39,7 @@ class SakeHomeViewWidget extends StatelessWidget {
             itemCount: snapshot.data!.docs.length,
             padding: const EdgeInsets.all(5.0),
             itemBuilder: (BuildContext context, int index) {
+              // タップされた日本酒に対する詳細画面への遷移処理を定義
               return Container(
                 child: GestureDetector(
                   onTap: () {

@@ -1,12 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:growing_sake/app_theme_color.dart';
-import 'package:growing_sake/sake_line_chart.dart';
-import 'package:growing_sake/sake_radar_chart.dart';
+import 'package:growing_sake/util/app_theme_color.dart';
+import 'package:growing_sake/component/sake_line_chart.dart';
+import 'package:growing_sake/component/sake_radar_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
+///
+/// 日本酒に対する詳細内容の表示
+///
 class SakeDetailWidget extends StatefulWidget {
   final arguments;
   const SakeDetailWidget({Key? key, required this.arguments}) : super(key: key);
@@ -32,6 +35,7 @@ class SakeDetailWidget extends StatefulWidget {
 //  飲み方
 //  香りグラフ
 class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProviderStateMixin {
+  // 特定名称リスト
   List<String> specificList = [
     '名称',
     '吟醸酒',
@@ -44,6 +48,7 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
     '特別本醸造酒',
   ];
 
+  // 飲み方リスト
   List<String> drinkingList = [
     '雪冷え(5℃)',
     '花冷え(10℃)',
@@ -57,16 +62,23 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
     '飛び切り燗(55℃)',
   ];
 
+  // 日本酒のドキュメントID
   String? docId;
+  // 初回データ取得か？
   bool firstTime = false;
 
+  // 詳細内容の表示非表示設定
   bool showPicker = false;
   late AnimationController _controller;
+  // 詳細表示状態に応じたアイコン
   IconData _iconData = Icons.add;
 
+  // 香グラフ用のラインチャート
   late SakeLineChart _sakeLineChart;
+  // 五味グラフ用のレーダーチャート
   late SakeRadarChart _sakeRadarChart;
 
+  // 日本酒の詳細内容に対する各種項目
   late DateTime _purchaseDateTime;
   final TextEditingController _title = TextEditingController();
   final TextEditingController _subtitle = TextEditingController();
@@ -103,6 +115,9 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
     });
   }
 
+  ///
+  /// 詳細内容の表示・非表示に対応するハンドリング
+  ///
   void _handleVisible() {
     setState(() {
       showPicker = !showPicker;
@@ -116,6 +131,10 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
     });
   }
 
+  ///
+  /// テキストエリアの入力に対する表示反映
+  /// 引数で設定された文字列をテキストエリアに反映してカーソル位置を末尾に設定する
+  ///
   void setControllerValue(TextEditingController controller, String? value) {
     if (value != null) {
       controller.text = value;
@@ -125,13 +144,19 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
     controller.selection = TextSelection.fromPosition(TextPosition(offset: controller.text.length));
   }
 
+  ///
+  /// 日本酒情報の取得処理
+  /// ドキュメントIDに対応する日本酒のデータをFirestoreから取得してテキストエリアに反映する
+  ///
   Future<DocumentSnapshot> getBrandData() async {
     Future<DocumentSnapshot> future;
+    // ドキュメントIDがあれば対応する情報を取得し、新規作成の場合はデフォルトパラメータの情報を取得する
     if (docId != null) {
       future = FirebaseFirestore.instance.collection('Brands').doc(docId).get();
     } else {
       future = FirebaseFirestore.instance.collection('Base').doc('defaultDoc').get();
     }
+    // スナップショットから各種パラメータを取得
     DocumentSnapshot snapshot = await future;
     if (firstTime == true) {
       Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
@@ -170,6 +195,10 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
     return future;
   }
 
+  ///
+  /// テキストフィールドに対するフォーカス設定処理
+  /// タップされたテキストフィールドに対してカーソルが当たるようにフォーカスを設定する
+  ///
   void setFocusScope(BuildContext context) {
     final FocusScopeNode currentScope = FocusScope.of(context);
     if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
@@ -177,6 +206,10 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
     }
   }
 
+  ///
+  /// 日付選択処理
+  /// カレンダーを表示して選択された日付を購入日エリアに設定する
+  ///
   Future<void> selectDate(BuildContext context) async {
     final DateTime? selected = await showDatePicker(
       context: context,
@@ -197,6 +230,9 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
     return FutureBuilder<DocumentSnapshot>(
       future: getBrandData(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        ///
+        /// データ取得中は処理中のプログレスを表示
+        ///
         if (!snapshot.hasData) {
           return const Center(
             child: CircularProgressIndicator(),
@@ -208,6 +244,9 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
             title: const Text('銘柄詳細'),
             automaticallyImplyLeading: true,
             actions: [
+              ///
+              /// 変更確定処理用のチェックボタン設定
+              ///
               IconButton(
                 icon: const Icon(Icons.check),
                 onPressed: () async {
@@ -233,6 +272,9 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                     _aromaLevelList.add(aroma.y);
                   }
 
+                  ///
+                  /// 各入力項目の内容をFirestoreに反映する
+                  ///
                   await docRef.set({
                         'title': _title.text,
                         'subtitle': _subtitle.text,
@@ -254,10 +296,17 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
               ),
             ],
           ),
+          ///
+          /// 詳細項目入力領域に対する画面スクロール設定
+          ///
           body: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
+                //
+                // 銘柄名テキストフィールド設定
+                // 銘柄名をタップされると日本酒名候補一覧画面に遷移して選択された銘柄名と地域を反映する
+                //
                 Container(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                   child: GestureDetector(
@@ -286,6 +335,9 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                     ),
                   ),
                 ),
+                //
+                // サブ銘柄名テキストフィールド設定
+                //
                 Container(
                   height: 45,
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
@@ -299,10 +351,16 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                     ),
                   ),
                 ),
+                ///
+                /// 日本酒の写真設定
+                ///
                 Container(
                   padding: const EdgeInsets.all(8),
                   child: Image.asset('images/ic_sake.png'),
                 ),
+                ///
+                /// 詳細項目の表示・非表示をするためのボタン設定
+                ///
                 Container(
                   padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
                   alignment: Alignment.centerLeft,
@@ -323,6 +381,10 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                     ),
                   ),
                 ),
+                ///
+                /// 詳細項目の表示・非表示に合わせてコンテナサイズを変更する
+                /// 非表示の場合には高さを0に設定する事で非表示状態にする
+                ///
                 SizeTransition(
                   sizeFactor: _controller,
                   child: Column(
@@ -331,6 +393,9 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                         padding: const EdgeInsets.all(8.0),
                         child: _sakeRadarChart,
                       ),
+                      ///
+                      /// 酒舗テキストフィールド設定
+                      ///
                       Container(
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                         child: GestureDetector(
@@ -343,6 +408,9 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                           ),
                         ),
                       ),
+                      ///
+                      /// 地域テキストフィールド設定
+                      ///
                       Container(
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                         child: GestureDetector(
@@ -355,6 +423,10 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                           ),
                         ),
                       ),
+                      ///
+                      /// 特定名称テキストフィールド設定
+                      /// 特定名称リストから選択する
+                      ///
                       Container(
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                         child: DropdownButtonFormField<String>(
@@ -372,6 +444,10 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                           }).toList(),
                         ),
                       ),
+                      ///
+                      /// 精米歩合テキストフィールド設定
+                      /// 数値のみの入力に制限する
+                      ///
                       Container(
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                         child: GestureDetector(
@@ -389,6 +465,9 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                           ),
                         ),
                       ),
+                      ///
+                      /// 原材料テキストフィールド設定
+                      ///
                       Container(
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                         child: GestureDetector(
@@ -401,6 +480,10 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                           ),
                         ),
                       ),
+                      ///
+                      /// 内容量テキストフィールド設定
+                      /// 数値のみの入力に制限する
+                      ///
                       Container(
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                         child: GestureDetector(
@@ -421,6 +504,10 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                     ],
                   ),
                 ),
+                ///
+                /// 購入日テキストフィールド設定
+                /// タップしてカレンダーから日付を選択する
+                ///
                 Container(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                   child: GestureDetector(
@@ -435,6 +522,10 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                     ),
                   ),
                 ),
+                ///
+                /// 保管温度テキストフィールド設定
+                /// 数値のみの入力に制限する
+                ///
                 Container(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                   child: GestureDetector(
@@ -449,6 +540,9 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                     ),
                   ),
                 ),
+                ///
+                /// 飲み方テキストフィールド設定
+                ///
                 Container(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                   child: DropdownButtonFormField<String>(
@@ -466,6 +560,9 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                     }).toList(),
                   ),
                 ),
+                ///
+                /// 香りグラフのラインチャート設定
+                ///
                 Container(
                   padding: const EdgeInsets.all(8),
                   child: _sakeLineChart,
@@ -479,6 +576,10 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
   }
 }
 
+///
+/// テキストフィールドのデコレーション設定
+/// 詳細画面でのテキストフィールドのデコレーション設定を設定する
+///
 class TextFieldDecoration extends InputDecoration {
   TextFieldDecoration(String text) : super(
     labelText: text,
@@ -492,6 +593,10 @@ class TextFieldDecoration extends InputDecoration {
   );
 }
 
+///
+/// サフィックス付きテキストフィールドのデコレーション設定
+/// 単位などをサフィックスで付けるようなテキストフィールドのデコレーションを設定する
+///
 class TextFieldWithSuffixDecoration extends InputDecoration {
   TextFieldWithSuffixDecoration(String text, String suffix) : super(
     labelText: text,

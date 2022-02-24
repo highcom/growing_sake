@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:growing_sake/app_theme_color.dart';
+import 'package:growing_sake/util/app_theme_color.dart';
 import 'package:numberpicker/numberpicker.dart';
 
+///
+/// 香りグラフ用ラインチャート
+/// [elapsedList] x軸の値となる経過日数
+/// [levelList] y軸の値となる香りレベル
+///
 class SakeLineChart extends StatefulWidget {
   final List<double> elapsedList;
   final List<double> levelList;
@@ -17,20 +22,28 @@ class SakeLineChart extends StatefulWidget {
 }
 
 class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProviderStateMixin {
+  // 折れ線用のグラデーションカラー
   List<Color> gradientColors = [
     const Color(0xff23b6e6),
     const Color(0xff02d39a),
   ];
 
+  // 香りデータ入力エリア表示・非表示設定
   bool showPicker = false;
   late AnimationController _controller;
   IconData _iconData = Icons.add;
 
+  // 選択日付
   late DateTime _selectDateTime;
+  // 選択日付表示用コントローラ
   final TextEditingController _selectDate = TextEditingController();
+  // 現在の日付
   double _currentDate = 0;
+  // 開始日
   double _startDate = 0;
+  // 終了日
   double _endDate = 0;
+  // 現在の香りレベル
   int _currentAromaLevel = 1;
 
   @override
@@ -42,6 +55,7 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
       duration: const Duration(milliseconds: 500),
     );
 
+    // コンストラクタで渡されたパラメータをグラフデータリストに追加していく
     setState(() {
       for (int i = 0; i < widget.elapsedList.length && i < widget.levelList.length; i++) {
         FlSpot data = FlSpot(widget.elapsedList[i], widget.levelList[i]);
@@ -57,6 +71,9 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
     super.initState();
   }
 
+  ///
+  /// 香りデータ入力エリアの表示・非表示設定
+  ///
   void _handleVisible() {
     setState(() {
       showPicker = !showPicker;
@@ -70,6 +87,9 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
     });
   }
 
+  ///
+  /// テキストフィールドのフォーカス設定
+  ///
   void setFocusScope(BuildContext context) {
     final FocusScopeNode currentScope = FocusScope.of(context);
     if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
@@ -77,6 +97,10 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
     }
   }
 
+  ///
+  /// 日付選択
+  /// 日付ピッカー画面を表示して日付を選択する
+  ///
   Future<void> selectDate(BuildContext context) async {
     final DateTime? selected = await showDatePicker(
       context: context,
@@ -92,8 +116,14 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
     }
   }
 
+  ///
+  /// ラインチャートデータ作成処理メイン
+  ///
   LineChartData mainData() {
     return LineChartData(
+      ///
+      /// グリッド表示設定
+      ///
       gridData: FlGridData(
         show: true,
         drawVerticalLine: true,
@@ -110,10 +140,14 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
           );
         },
       ),
+      ///
+      /// x軸y軸メモリ表示設定
+      ///
       titlesData: FlTitlesData(
         show: true,
         rightTitles: SideTitles(showTitles: false),
         topTitles: SideTitles(showTitles: false),
+        // x軸のメモリ表示(日付)設定
         bottomTitles: SideTitles(
           showTitles: true,
           reservedSize: 22,
@@ -134,6 +168,7 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
           margin: 8,
           rotateAngle: 60.0,
         ),
+        // y軸のメモリ表示(香りレベル)設定
         leftTitles: SideTitles(
           showTitles: true,
           interval: 1,
@@ -157,6 +192,9 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
           margin: 12,
         ),
       ),
+      ///
+      /// 香りデータのラインチャート表示設定
+      ///
       borderData: FlBorderData(
           show: true,
           border: Border.all(color: const Color(0xff37434d), width: 1)),
@@ -194,6 +232,9 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
           color: Color(0xffa9c6fd)),
       child: Column(
         children: [
+          ///
+          /// データ入力エリア表示・非表示ボタン
+          ///
           Container(
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
             alignment: Alignment.centerLeft,
@@ -214,10 +255,16 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
               ),
             ),
           ),
+          ///
+          /// データ入力エリア
+          ///
           SizeTransition(
             sizeFactor: _controller,
             child: Row(
               children: [
+                ///
+                /// 日付入力テキストフィールド
+                ///
                 Flexible(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
@@ -238,6 +285,9 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
                   padding: EdgeInsets.fromLTRB(12, 0, 0, 0),
                   child: Text('香り'),
                 ),
+                ///
+                /// 香りレベル入力ピッカー
+                ///
                 NumberPicker(
                   itemHeight: 40,
                   itemWidth: 50,
@@ -246,6 +296,9 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
                   maxValue: 10,
                   onChanged: (value) => setState(() => _currentAromaLevel = value),
                 ),
+                ///
+                /// 香りデータ設定ボタン
+                ///
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 12, 0),
                   child: RaisedButton(
@@ -275,6 +328,9 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
               ],
             ),
           ),
+          ///
+          /// ラインチャート表示エリア
+          ///
           Stack(
             children: <Widget>[
               AspectRatio(
@@ -300,6 +356,9 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
   }
 }
 
+///
+/// テキストフィールドのデコレーション設定
+///
 class TextFieldDecoration extends InputDecoration {
   TextFieldDecoration(String text) : super(
     labelText: text,

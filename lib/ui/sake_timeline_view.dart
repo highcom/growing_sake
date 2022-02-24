@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+///
+/// 日本酒のタイムラインでの一覧表示
+/// 全てのユーザーの直近の投稿についてタイムラインで表示する
+///
 class SakeTimelineViewWidget extends StatelessWidget {
   final Color color;
   final String title;
 
   const SakeTimelineViewWidget({Key? key, required this.color, required this.title}) : super(key: key);
 
+  ///
+  /// スナップショットから引数で指定された項目の内容を設定する
+  ///
   String getSnapshotValue(QueryDocumentSnapshot snapshot, String name) {
     try {
       String? value = snapshot[name];
@@ -29,6 +36,9 @@ class SakeTimelineViewWidget extends StatelessWidget {
       body: StreamBuilder(
           stream: FirebaseFirestore.instance.collection('Brands').snapshots(),
           builder: (BuildContext context,
+              ///
+              /// データ取得中は処理中のプログレスを表示
+              ///
               AsyncSnapshot<QuerySnapshot> snapshot) {
             if (!snapshot.hasData) {
               return const Center(
@@ -36,6 +46,9 @@ class SakeTimelineViewWidget extends StatelessWidget {
               );
             }
 
+            ///
+            /// Firestoreから取得したデータをGグリッド表示で並べる
+            ///
             return GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 1,

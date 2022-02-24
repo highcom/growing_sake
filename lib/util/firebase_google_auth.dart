@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:growing_sake/login_home.dart';
+import 'package:growing_sake/util/login_home.dart';
 
+///
+/// FirebaseでのGoogle認証によるログイン
+///
 class FirebaseGoogleAuth extends StatelessWidget {
 
   // Google 認証
@@ -28,6 +31,9 @@ class FirebaseGoogleAuth extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
 
+            ///
+            /// Google認証によるログイン処理ボタン
+            ///
             ButtonTheme(
               minWidth: 350.0,
               // height: 100.0,
@@ -70,6 +76,8 @@ class FirebaseGoogleAuth extends StatelessWidget {
               ),
             ),
 
+            ///
+            /// Google認証によるログアウト処理ボタン
             ButtonTheme(
               minWidth: 350.0,
               // height: 100.0,

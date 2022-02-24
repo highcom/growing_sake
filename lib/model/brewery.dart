@@ -1,3 +1,6 @@
+///
+/// 酒舗データクラス
+///
 class Brewery {
   final int id;
   final String name;

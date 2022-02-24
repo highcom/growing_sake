@@ -1,3 +1,6 @@
+///
+/// 日本酒銘柄データクラス
+///
 class Brand {
   final int id;
   final String name;

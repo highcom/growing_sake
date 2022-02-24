@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:growing_sake/app_theme_color.dart';
-import 'package:growing_sake/candidate_list.dart';
-import 'package:growing_sake/sake_detail.dart';
-import 'package:growing_sake/sake_home_view.dart';
-import 'package:growing_sake/sake_timeline_view.dart';
-import 'package:growing_sake/firebase_google_auth.dart';
+import 'package:growing_sake/util/app_theme_color.dart';
+import 'package:growing_sake/component/candidate_list.dart';
+import 'package:growing_sake/ui/sake_detail.dart';
+import 'package:growing_sake/ui/sake_home_view.dart';
+import 'package:growing_sake/ui/sake_timeline_view.dart';
+import 'package:growing_sake/util/firebase_google_auth.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,6 +13,10 @@ void main() async{
   runApp(const GrowingSakeApp());
 }
 
+///
+/// メイン画面のウィジェット
+/// 画面遷移のためのルーティングを定義する
+///
 class GrowingSakeApp extends StatelessWidget {
   const GrowingSakeApp({Key? key}) : super(key: key);
 
@@ -47,6 +51,9 @@ class GrowingSakeWidget extends StatefulWidget {
   State<GrowingSakeWidget> createState() => _GrowingSakeWidgetState();
 }
 
+///
+/// 画面下部のメニュー項目を定義する
+///
 class _GrowingSakeWidgetState extends State<GrowingSakeWidget> {
   int _currentIndex = 0;
   bool _fabVisible = true;
@@ -69,6 +76,7 @@ class _GrowingSakeWidgetState extends State<GrowingSakeWidget> {
         title: const Text('日本酒を育てる'),
       ),
       body: _pageWidgets.elementAt(_currentIndex),
+      // 画面下部のナビゲーションバーを定義
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
@@ -92,6 +100,10 @@ class _GrowingSakeWidgetState extends State<GrowingSakeWidget> {
     );
   }
 
+  ///
+  /// アイテム追加用のフローティングボタンの表示・非表示の定義
+  /// ナビゲーションメニューのIDである[index]がホームの場合のみ表示する
+  ///
   void _onItemTapped(int index) => setState(() {
     _currentIndex = index;
     if (_currentIndex == 0) {

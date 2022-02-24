@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:growing_sake/app_theme_color.dart';
+import 'package:growing_sake/util/app_theme_color.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
-import 'package:growing_sake/brand.dart';
-import 'package:growing_sake/brewery.dart';
-import 'package:growing_sake/area.dart';
+import 'package:growing_sake/model/brand.dart';
+import 'package:growing_sake/model/brewery.dart';
+import 'package:growing_sake/model/area.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'dart:convert' show json;
 @JsonSerializable()
 
+///
+/// 日本酒銘柄一覧ウィジェット
+/// さけのわAPIを利用して日本酒の銘柄を取得する
+///
 class CandidateListWidget extends StatefulWidget {
+  // 選択された銘柄名
   final arguments;
   const CandidateListWidget({Key? key, required this.arguments}) : super(key: key);
 
@@ -20,16 +25,27 @@ class CandidateListWidget extends StatefulWidget {
 class _CandidateListState extends State<CandidateListWidget> {
   final _focusNode = FocusNode();
 
+  // 銘柄名の初期値
   List<String> _defaultParams = [];
+  // 全銘柄名のリスト
   List<Brand> allBrands = [];
+  // 検索銘柄名のリスト
   List<Brand> searchBrands = [];
+  // 酒舗リスト
   List<Brewery> breweries = [];
+  // 地域リスト
   List<Area> areas = [];
+  // 日本酒銘柄名
   String? _title = '';
+  // テキストフィールドのカーソル位置をコントロールする
   final TextEditingController? _nameController = TextEditingController();
 
+  // 選択された銘柄に対する酒舗と地域の結果
   Map<String, String> result = {};
 
+  ///
+  /// さけのわAPIを利用して銘柄、酒舗、地域の一覧を取得
+  ///
   Future<List<Brand>> fetchBrands() async {
     List<Brand> brands = [];
 
@@ -60,6 +76,9 @@ class _CandidateListState extends State<CandidateListWidget> {
     return brands;
   }
 
+  ///
+  /// 入力された文字列で日本酒銘柄をフィルタする処理
+  ///
   void _runFilter(String enteredKeyword) {
     List<Brand> results = [];
     if (enteredKeyword.isEmpty) {
@@ -108,6 +127,9 @@ class _CandidateListState extends State<CandidateListWidget> {
       ),
       body: Column(
         children: [
+          ///
+          /// 日本酒銘柄検索用テキストフィールド
+          ///
           Container(
             padding: const EdgeInsets.all(8),
             child: GestureDetector(
@@ -139,6 +161,10 @@ class _CandidateListState extends State<CandidateListWidget> {
               ),
             ),
           ),
+          ///
+          /// 日本酒銘柄一覧表示リスト
+          /// 文字列検索でフィルタされた一覧を表示する
+          ///
           Flexible(child:
             FutureBuilder<List<Brand>> (
               future: fetchBrands(),
@@ -165,6 +191,10 @@ class _CandidateListState extends State<CandidateListWidget> {
     );
   }
 
+  ///
+  /// 日本酒銘柄項目作成
+  /// 一覧に表示する日本酒銘柄名の表示と対応する酒舗と地域を保持する
+  ///
   Widget _candidateItem(Brand brand) {
     return Container(
       decoration: const BoxDecoration(

@@ -4,6 +4,11 @@ import 'package:fl_chart/fl_chart.dart';
 const artColor = Color(0xff63e7e5);
 const baseColor = Color(0x44afafaf);
 
+///
+/// 五味グラフ用レーダーチャート
+/// [title] グラフタイトル
+/// [fiveFlavorList] 五味データ
+///
 class SakeRadarChart extends StatefulWidget {
   final String title;
   final Map<String, int> fiveFlavorList;
@@ -18,11 +23,17 @@ class SakeRadarChart extends StatefulWidget {
 const gridColor = Color(0xff68739f);
 const titleColor = Color(0xff8c95db);
 
+///
+/// プリミティブ型データ設定
+///
 class PrimitiveParameter {
   int param;
   PrimitiveParameter({required this.param});
 }
 
+///
+/// 五味データ
+///
 class FiveFlavorParameter {
   final PrimitiveParameter sweetness = PrimitiveParameter(param: 3);
   final PrimitiveParameter sourness = PrimitiveParameter(param: 3);
@@ -31,6 +42,9 @@ class FiveFlavorParameter {
   final PrimitiveParameter astringent = PrimitiveParameter(param: 3);
 }
 
+///
+/// レーダーチャート用RAWデータ
+///
 class RawDataSet {
   final String title;
   final Color color;
@@ -45,10 +59,12 @@ class RawDataSet {
 
 class _SakeRadarChartState extends State<SakeRadarChart> {
 
+  // 選択データINDEX
   int selectedDataSetIndex = -1;
 
   @override
   void initState() {
+    // 五味データの初期値を設定する
     setState(() {
       if (widget.fiveFlavorList.containsKey('sweetness')) {
         widget.fiveFlavorParameter.sweetness.param = widget.fiveFlavorList['sweetness']!;
@@ -69,6 +85,10 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
     super.initState();
   }
 
+  ///
+  /// レーダーチャート表示データ設定
+  /// [selectedDataSetIndex] 選択データINDEX
+  ///
   List<RadarDataSet> showingDataSets(int selectedDataSetIndex) {
     return rawDataSets().asMap().entries.map((entry) {
       var index = entry.key;
@@ -94,6 +114,9 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
     }).toList();
   }
 
+  ///
+  /// レーダーチャート用RAWデータ設定
+  ///
   List<RawDataSet> rawDataSets() {
     return [
       RawDataSet(
@@ -132,6 +155,13 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
     ];
   }
 
+  ///
+  /// 円形ボタンウィジェット
+  /// [icon] ボタンに表示するアイコン
+  /// [stateSetter] setStateするオブジェクト
+  /// [parameter] 五味データ
+  /// [value] 増減値
+  ///
   Widget roundRaisedButton(IconData icon, StateSetter stateSetter, PrimitiveParameter parameter, int value) {
     return RaisedButton(
       child: Icon(icon),
@@ -153,6 +183,9 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
     );
   }
 
+  ///
+  /// 五味データ入力ダイアログ
+  ///
   Future<FiveFlavorParameter?> showInputDialog(BuildContext context, FiveFlavorParameter params) {
     FiveFlavorParameter _fiveFlavor = FiveFlavorParameter();
     _fiveFlavor = params;
@@ -237,6 +270,9 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        ///
+        /// レーダーチャートタイトル
+        ///
         GestureDetector(
           onTap: () {
             setState(() {
@@ -253,6 +289,9 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
           ),
         ),
         const SizedBox(height: 4),
+        ///
+        /// グラフのデータ名称
+        ///
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: rawDataSets()
@@ -318,6 +357,9 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
               .values
               .toList(),
         ),
+        ///
+        /// レーダーチャート本体
+        ///
         AspectRatio(
           aspectRatio: 1.3,
           child: RadarChart(

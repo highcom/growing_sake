@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+///
+/// アプリのテーマカラー設定
+///
 class AppThemeColor {
   static const MaterialColor baseColor = MaterialColor(
     _baseColorValue,

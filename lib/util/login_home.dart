@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
+///
+/// Google認証によるログイン成功画面
+///
 class LoginHome extends StatelessWidget {
 
   final String user_id;
-  LoginHome({Key? key, required this.user_id}) : super(key: key);
+  const LoginHome({Key? key, required this.user_id}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
