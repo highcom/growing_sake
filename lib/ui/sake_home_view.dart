@@ -1,23 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:growing_sake/main.dart';
+import 'package:growing_sake/model/uid_docid_args.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 ///
 /// 日本酒一覧表示画面
 /// Firestoreから自分が登録した日本酒を取得して一覧で表示する
 ///
-class SakeHomeViewWidget extends StatelessWidget {
+class SakeHomeViewWidget extends HookConsumerWidget {
   final Color color;
   final String title;
 
   const SakeHomeViewWidget({Key? key, required this.color, required this.title}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
 
+    final String uid = ref.watch(uidProvider);
     var assetsImage = "images/ic_sake.png";
     return Scaffold(
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('Brands').snapshots(),
+        stream: FirebaseFirestore.instance.collection(uid).snapshots(),
         builder: (BuildContext context,
           // データ取得中は処理中のプログレスを表示
           AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -43,7 +47,7 @@ class SakeHomeViewWidget extends StatelessWidget {
               return Container(
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.of(context).pushNamed('/sake_detail', arguments: snapshot.data!.docs[index].id);
+                    Navigator.of(context).pushNamed('/sake_detail', arguments: UidDocIdArgs(uid, snapshot.data!.docs[index].id));
                   },
                   child: Column(
                     children: <Widget>[

@@ -1,17 +1,22 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:growing_sake/model/uid_docid_args.dart';
 import 'package:growing_sake/util/app_theme_color.dart';
 import 'package:growing_sake/component/candidate_list.dart';
 import 'package:growing_sake/ui/sake_detail.dart';
 import 'package:growing_sake/ui/sake_home_view.dart';
 import 'package:growing_sake/ui/sake_timeline_view.dart';
 import 'package:growing_sake/util/firebase_google_auth.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(const GrowingSakeApp());
+  runApp(const ProviderScope(child: GrowingSakeApp()));
 }
+
+final uidProvider = StateProvider<String>((ref) => "");
 
 ///
 /// メイン画面のウィジェット
@@ -43,18 +48,18 @@ class GrowingSakeApp extends StatelessWidget {
   }
 }
 
-class GrowingSakeWidget extends StatefulWidget {
+class GrowingSakeWidget extends StatefulHookConsumerWidget {
   const GrowingSakeWidget({Key? key, required this.title}) : super(key: key);
   final String title;
 
   @override
-  State<GrowingSakeWidget> createState() => _GrowingSakeWidgetState();
+  ConsumerState<GrowingSakeWidget> createState() => _GrowingSakeWidgetState();
 }
 
 ///
 /// 画面下部のメニュー項目を定義する
 ///
-class _GrowingSakeWidgetState extends State<GrowingSakeWidget> {
+class _GrowingSakeWidgetState extends ConsumerState<GrowingSakeWidget> {
   int _currentIndex = 0;
   bool _fabVisible = true;
   final _pageWidgets = [
@@ -65,8 +70,19 @@ class _GrowingSakeWidgetState extends State<GrowingSakeWidget> {
 
   void _DetailSakeTransition() {
     setState(() {
-      Navigator.of(context).pushNamed("/sake_detail");
+      Navigator.of(context).pushNamed("/sake_detail", arguments: UidDocIdArgs('Base', 'defaultDoc'));
     });
+  }
+
+  @override
+  void initState() {
+    // 既に認証済みの状態であればuidを保持しておく
+    final _auth = FirebaseAuth.instance;
+    User? _user = _auth.currentUser;
+    if (_user != null) {
+      ref.read(uidProvider.notifier).state = _user.uid;
+    }
+    super.initState();
   }
 
   @override

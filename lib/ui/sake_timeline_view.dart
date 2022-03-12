@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:growing_sake/model/uid_docid_args.dart';
 
 ///
 /// 日本酒のタイムラインでの一覧表示
@@ -61,7 +62,7 @@ class SakeTimelineViewWidget extends StatelessWidget {
                 return Container(
                   child: GestureDetector(
                       onTap: () {
-                        Navigator.of(context).pushNamed('/sake_detail', arguments: snapshot.data!.docs[index].id);
+                        Navigator.of(context).pushNamed('/sake_detail', arguments: UidDocIdArgs('Brands', snapshot.data!.docs[index].id));
                       },
                       child: Row(
                         children: <Widget>[

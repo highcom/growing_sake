@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:growing_sake/main.dart';
 import 'package:growing_sake/util/login_home.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 ///
 /// FirebaseでのGoogle認証によるログイン
 ///
-class FirebaseGoogleAuth extends StatelessWidget {
+class FirebaseGoogleAuth extends HookConsumerWidget {
 
   // Google 認証
   final _google_signin  = GoogleSignIn(scopes: [
@@ -23,7 +25,7 @@ class FirebaseGoogleAuth extends StatelessWidget {
   late User user;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
 
     return Scaffold(
       body: Center(
@@ -61,6 +63,7 @@ class FirebaseGoogleAuth extends StatelessWidget {
                     try {
                       result = await _auth.signInWithCredential(credential);
                       user = result.user!;
+                      ref.read(uidProvider.notifier).state = user.uid;
 
                       Navigator.push(
                           context,

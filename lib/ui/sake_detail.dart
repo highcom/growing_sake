@@ -1,21 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:growing_sake/main.dart';
+import 'package:growing_sake/model/uid_docid_args.dart';
 import 'package:growing_sake/util/app_theme_color.dart';
 import 'package:growing_sake/component/sake_line_chart.dart';
 import 'package:growing_sake/component/sake_radar_chart.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 ///
 /// 日本酒に対する詳細内容の表示
 ///
-class SakeDetailWidget extends StatefulWidget {
+class SakeDetailWidget extends StatefulHookConsumerWidget {
   final arguments;
   const SakeDetailWidget({Key? key, required this.arguments}) : super(key: key);
 
   @override
-  State<SakeDetailWidget> createState() => _SakeDetailState();
+  ConsumerState<SakeDetailWidget> createState() => _SakeDetailState();
 }
 
 // 基本
@@ -34,7 +37,7 @@ class SakeDetailWidget extends StatefulWidget {
 //  保管温度
 //  飲み方
 //  香りグラフ
-class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProviderStateMixin {
+class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTickerProviderStateMixin {
   // 特定名称リスト
   List<String> specificList = [
     '名称',
@@ -62,6 +65,7 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
     '飛び切り燗(55℃)',
   ];
 
+  late String uid;
   // 日本酒のドキュメントID
   String? docId;
   // 初回データ取得か？
@@ -94,9 +98,9 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
 
   @override
   void initState() {
-    if (widget.arguments != null) {
-      docId = widget.arguments as String;
-    }
+    final UidDocIdArgs uidDocIdArgs = widget.arguments as UidDocIdArgs;
+    uid = uidDocIdArgs.uid;
+    docId = uidDocIdArgs.docId;
     firstTime = true;
     setFilters();
     _controller = AnimationController(
@@ -152,7 +156,7 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
     Future<DocumentSnapshot> future;
     // ドキュメントIDがあれば対応する情報を取得し、新規作成の場合はデフォルトパラメータの情報を取得する
     if (docId != null) {
-      future = FirebaseFirestore.instance.collection('Brands').doc(docId).get();
+      future = FirebaseFirestore.instance.collection(uid).doc(docId).get();
     } else {
       future = FirebaseFirestore.instance.collection('Base').doc('defaultDoc').get();
     }
@@ -251,10 +255,18 @@ class _SakeDetailState extends State<SakeDetailWidget> with SingleTickerProvider
                 icon: const Icon(Icons.check),
                 onPressed: () async {
                   DocumentReference docRef;
-                  if (docId != null) {
-                    docRef = FirebaseFirestore.instance.collection('Brands').doc(docId);
+                  String wuid;
+                  // 新規作成の場合は、自分のUIDにドキュメントを保存するようにuidを取得する
+                  if (uid == 'Base') {
+                    wuid = ref.watch(uidProvider);
                   } else {
-                    docRef = FirebaseFirestore.instance.collection('Brands').doc();
+                    wuid = uid;
+                  }
+                  // docIdがあれば上書き更新する
+                  if (docId != null) {
+                    docRef = FirebaseFirestore.instance.collection(wuid).doc(docId);
+                  } else {
+                    docRef = FirebaseFirestore.instance.collection(wuid).doc();
                   }
 
                   var _fiveFlavorList = <String, int>{
