@@ -1,14 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:growing_sake/main.dart';
 import 'package:growing_sake/model/uid_docid_args.dart';
 import 'package:growing_sake/util/app_theme_color.dart';
+import 'package:growing_sake/util/firebase_storage_access.dart';
 import 'package:growing_sake/component/sake_line_chart.dart';
 import 'package:growing_sake/component/sake_radar_chart.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:image_picker/image_picker.dart';
 
 ///
 /// 日本酒に対する詳細内容の表示
@@ -133,6 +136,15 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
         _iconData = Icons.add;
       }
     });
+  }
+
+  ///
+  /// イメージファイルのアップロード処理
+  /// FirebaseStorageにImagePickerで指定された画像をアップロードする
+  ///
+  Future<void> _storageUpload() async {
+    final file = await ImagePicker().pickImage(source: ImageSource.gallery);
+    firebase_storage.UploadTask? task = await FirebaseStorageAccess.uploadFile(uid, docId!, file);
   }
 
   ///
@@ -368,7 +380,18 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                 ///
                 Container(
                   padding: const EdgeInsets.all(8),
-                  child: Image.asset('images/ic_sake.png'),
+                  child: GestureDetector(
+                    onTap: () => _storageUpload(),
+                    child: FutureBuilder<String>(
+                      future: FirebaseStorageAccess.toDownloadUrl(uid + '/' + docId! + '.JPG'),
+                      builder: (context, imagesnapshot) => imagesnapshot.hasData ? InkWell(
+                        child: Image.network(
+                          imagesnapshot.data as String,
+                          fit: BoxFit.cover,
+                        ),
+                      ) : Image.asset('images/ic_sake.png', fit: BoxFit.cover,),
+                    ),
+                  ),
                 ),
                 ///
                 /// 詳細項目の表示・非表示をするためのボタン設定

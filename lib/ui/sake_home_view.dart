@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:growing_sake/main.dart';
 import 'package:growing_sake/model/uid_docid_args.dart';
+import 'package:growing_sake/util/firebase_storage_access.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 ///
@@ -18,7 +19,6 @@ class SakeHomeViewWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
 
     final String uid = ref.watch(uidProvider);
-    var assetsImage = "images/ic_sake.png";
     return Scaffold(
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection(uid).snapshots(),
@@ -51,7 +51,15 @@ class SakeHomeViewWidget extends HookConsumerWidget {
                   },
                   child: Column(
                     children: <Widget>[
-                      Image.asset(assetsImage, fit: BoxFit.cover,),
+                      FutureBuilder<String>(
+                        future: FirebaseStorageAccess.toDownloadUrl(uid + '/' + snapshot.data!.docs[index].id + '.JPG'),
+                        builder: (context, imagesnapshot) => imagesnapshot.hasData ? InkWell(
+                          child: Image.network(
+                            imagesnapshot.data as String,
+                            fit: BoxFit.cover,
+                          ),
+                        ) : Image.asset('images/ic_sake.png', fit: BoxFit.cover,),
+                      ),
                       Container(
                         margin: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                         child: Text(
