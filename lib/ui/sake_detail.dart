@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
@@ -12,6 +14,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image/image.dart' as img;
 
 ///
 /// 日本酒に対する詳細内容の表示
@@ -67,6 +70,8 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
     '熱燗(50℃)',
     '飛び切り燗(55℃)',
   ];
+
+  firebase_storage.UploadTask? uploadTask;
 
   late String uid;
   // 日本酒のドキュメントID
@@ -143,8 +148,17 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
   /// FirebaseStorageにImagePickerで指定された画像をアップロードする
   ///
   Future<void> _storageUpload() async {
-    final file = await ImagePicker().pickImage(source: ImageSource.gallery);
-    firebase_storage.UploadTask? task = await FirebaseStorageAccess.uploadFile(uid, docId!, file);
+    final xfile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final file = File(xfile!.path);
+    final bytes = await file.readAsBytes();
+    img.Image src = img.decodeImage(bytes)!;
+    img.Image croppedImage = img.copyResizeCropSquare(src, 512);
+    final encodeFile = await File(file.path).writeAsBytes(img.encodeJpg(croppedImage));
+
+    firebase_storage.UploadTask? task = await FirebaseStorageAccess.uploadFile(uid, docId!, XFile(encodeFile.path));
+    setState(() {
+      uploadTask = task;
+    });
   }
 
   ///
