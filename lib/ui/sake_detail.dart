@@ -396,11 +396,11 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                   padding: const EdgeInsets.all(8),
                   child: GestureDetector(
                     onTap: () => _storageUpload(),
-                    child: FutureBuilder<String>(
-                      future: FirebaseStorageAccess.toDownloadUrl(uid + '/' + docId! + '.JPG'),
-                      builder: (context, imagesnapshot) => imagesnapshot.hasData ? InkWell(
+                    child: FutureBuilder<String?>(
+                      future: FirebaseStorageAccess.downloadFile(uid + '/' + docId! + '.JPG'),
+                      builder: (context, imageSnapshot) => imageSnapshot.hasData ? InkWell(
                         child: Image.network(
-                          imagesnapshot.data as String,
+                          imageSnapshot.data as String,
                           fit: BoxFit.cover,
                         ),
                       ) : Image.asset('images/ic_sake.png', fit: BoxFit.cover,),

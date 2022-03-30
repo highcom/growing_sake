@@ -51,11 +51,11 @@ class SakeHomeViewWidget extends HookConsumerWidget {
                   },
                   child: Column(
                     children: <Widget>[
-                      FutureBuilder<String>(
-                        future: FirebaseStorageAccess.toDownloadUrl(uid + '/' + snapshot.data!.docs[index].id + '.JPG'),
-                        builder: (context, imagesnapshot) => imagesnapshot.hasData ? InkWell(
+                      FutureBuilder<String?>(
+                        future: FirebaseStorageAccess.downloadFile(uid + '/' + snapshot.data!.docs[index].id + '.JPG'),
+                        builder: (context, imageSnapshot) => imageSnapshot.hasData ? InkWell(
                           child: Image.network(
-                            imagesnapshot.data as String,
+                            imageSnapshot.data as String,
                             fit: BoxFit.cover,
                           ),
                         ) : Image.asset('images/ic_sake.png', fit: BoxFit.cover,),
