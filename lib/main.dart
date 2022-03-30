@@ -61,7 +61,8 @@ class GrowingSakeWidget extends StatefulHookConsumerWidget {
 ///
 class _GrowingSakeWidgetState extends ConsumerState<GrowingSakeWidget> {
   int _currentIndex = 0;
-  bool _fabVisible = true;
+  String uid = "";
+  bool _fabVisible = false;
   final _pageWidgets = [
     const SakeHomeViewWidget(color:Colors.white, title:'Home'),
     const SakeTimelineViewWidget(color:Colors.white, title:'Timeline'),
@@ -81,12 +82,15 @@ class _GrowingSakeWidgetState extends ConsumerState<GrowingSakeWidget> {
     User? _user = _auth.currentUser;
     if (_user != null) {
       ref.read(uidProvider.notifier).state = _user.uid;
+      uid = _user.uid;
     }
+    _setFabVisible();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    uid = ref.watch(uidProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('日本酒を育てる'),
@@ -117,15 +121,23 @@ class _GrowingSakeWidgetState extends ConsumerState<GrowingSakeWidget> {
   }
 
   ///
-  /// アイテム追加用のフローティングボタンの表示・非表示の定義
-  /// ナビゲーションメニューのIDである[index]がホームの場合のみ表示する
+  /// 下部メニュータップ時の処理
+  /// タップされたメニューに応じたIDを設定する
   ///
   void _onItemTapped(int index) => setState(() {
     _currentIndex = index;
-    if (_currentIndex == 0) {
+    _setFabVisible();
+  });
+
+  ///
+  /// アイテム追加用のフローティングボタンの表示・非表示の定義
+  /// ナビゲーションメニューのIDである[index]がホームでユーザー認証済みの場合のみ表示する
+  ///
+  void _setFabVisible() {
+    if (_currentIndex == 0 && uid.compareTo("") != 0) {
       _fabVisible = true;
     } else {
       _fabVisible = false;
     }
-  });
+  }
 }

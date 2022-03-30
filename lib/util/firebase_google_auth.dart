@@ -24,6 +24,8 @@ class FirebaseGoogleAuth extends HookConsumerWidget {
   late UserCredential result;
   late User user;
 
+  FirebaseGoogleAuth({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
 
@@ -96,6 +98,7 @@ class FirebaseGoogleAuth extends HookConsumerWidget {
                   onPressed: () {
                     _auth.signOut();
                     _google_signin.signOut();
+                    ref.read(uidProvider.notifier).state = "";
                     print('サインアウトしました。');
                   }
               ),
