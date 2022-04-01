@@ -71,13 +71,18 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
     '飛び切り燗(55℃)',
   ];
 
+  // FirebaseStorageへのアップロードタスクオブジェクト
   firebase_storage.UploadTask? uploadTask;
 
+  // ユーザーID
   late String uid;
   // 日本酒のドキュメントID
   String? docId;
   // 初回データ取得か？
   bool firstTime = false;
+
+  // 選択画像ファイルオブジェクト
+  File? encodeFile;
 
   // 詳細内容の表示非表示設定
   bool showPicker = false;
@@ -144,8 +149,8 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
   }
 
   ///
-  /// イメージファイルのアップロード処理
-  /// FirebaseStorageにImagePickerで指定された画像をアップロードする
+  /// 選択画像を詳細画面に反映させる処理
+  /// ImagePickerで指定された画像を詳細画面に反映する
   ///
   Future<void> _storageUpload() async {
     final xfile = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -153,11 +158,9 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
     final bytes = await file.readAsBytes();
     img.Image src = img.decodeImage(bytes)!;
     img.Image croppedImage = img.copyResizeCropSquare(src, 512);
-    final encodeFile = await File(file.path).writeAsBytes(img.encodeJpg(croppedImage));
-
-    firebase_storage.UploadTask? task = await FirebaseStorageAccess.uploadFile(uid, docId!, XFile(encodeFile.path));
+    final encFile = await File(file.path).writeAsBytes(img.encodeJpg(croppedImage));
     setState(() {
-      uploadTask = task;
+      encodeFile = encFile;
     });
   }
 
@@ -181,11 +184,7 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
   Future<DocumentSnapshot> getBrandData() async {
     Future<DocumentSnapshot> future;
     // ドキュメントIDがあれば対応する情報を取得し、新規作成の場合はデフォルトパラメータの情報を取得する
-    if (docId != null) {
-      future = FirebaseFirestore.instance.collection(uid).doc(docId).get();
-    } else {
-      future = FirebaseFirestore.instance.collection('Base').doc('defaultDoc').get();
-    }
+    future = FirebaseFirestore.instance.collection(uid).doc(docId).get();
     // スナップショットから各種パラメータを取得
     DocumentSnapshot snapshot = await future;
     if (firstTime == true) {
@@ -255,6 +254,29 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
     }
   }
 
+  ///
+  /// 選択画像削除ボタン
+  /// FirebaseStorageにアップロードする前の選択画像を削除する
+  ///
+  Widget _imageDeleteButton() {
+    return RaisedButton(
+      child: const Icon(Icons.cancel_outlined),
+      color: Colors.white,
+      shape: const CircleBorder(
+        side: BorderSide(
+          color: Colors.white,
+          width: 1,
+          style: BorderStyle.solid,
+        ),
+      ),
+      onPressed: () {
+        setState(() {
+          encodeFile = null;
+        });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<DocumentSnapshot>(
@@ -289,7 +311,7 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                     wuid = uid;
                   }
                   // docIdがあれば上書き更新する
-                  if (docId != null) {
+                  if (docId!.compareTo('defaultDoc') != 0) {
                     docRef = FirebaseFirestore.instance.collection(wuid).doc(docId);
                   } else {
                     docRef = FirebaseFirestore.instance.collection(wuid).doc();
@@ -329,6 +351,15 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                         'aromaElapsedList': FieldValue.arrayUnion(_aromaElapsedList),
                         'aromaLevelList': FieldValue.arrayUnion(_aromaLevelList),
                   });
+
+                  // 選択された画像ファイルをFirebaseStorageへアップロードする
+                  if (encodeFile != null) {
+                    firebase_storage
+                        .UploadTask? task = await FirebaseStorageAccess
+                        .uploadFile(wuid, docRef.id, XFile(encodeFile!.path));
+                  }
+
+                  // 詳細画面を終了する
                   Navigator.of(context).pop();
                 },
               ),
@@ -398,11 +429,24 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                     onTap: () => _storageUpload(),
                     child: FutureBuilder<String?>(
                       future: FirebaseStorageAccess.downloadFile(uid + '/' + docId! + '.JPG'),
-                      builder: (context, imageSnapshot) => imageSnapshot.hasData ? InkWell(
+                      builder: (context, imageSnapshot) => (encodeFile == null && imageSnapshot.hasData) ?
+                      // FirebaseStorageに画像があれば表示
+                      InkWell(
                         child: Image.network(
                           imageSnapshot.data as String,
                           fit: BoxFit.cover,
                         ),
+                      ) : encodeFile != null ?
+                      // 選択された画像があれば表示
+                      Column(
+                        children: [
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: _imageDeleteButton(),
+                          ),
+                          Image.file(encodeFile!)
+                        ],
+                        // 選択画像が無ければアイコン画像を表示
                       ) : Image.asset('images/ic_sake.png', fit: BoxFit.cover,),
                     ),
                   ),
