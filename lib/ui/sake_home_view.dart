@@ -49,7 +49,35 @@ class SakeHomeViewWidget extends HookConsumerWidget {
               return Container(
                 child: GestureDetector(
                   onTap: () {
+                    // タップされた場合は詳細画面に遷移する
                     Navigator.of(context).pushNamed('/sake_detail', arguments: UidDocIdArgs(uid, snapshot.data!.docs[index].id));
+                  },
+                  onLongPress: () {
+                    // 長押しされた場合は削除ダイアログを表示する
+                    showDialog(
+                      context: context,
+                      builder: (_) {
+                        return AlertDialog(
+                          title: Text(snapshot.data!.docs[index]['title']),
+                          content: Text("削除しますか？"),
+                          actions: <Widget>[
+                            // ボタン領域
+                            FlatButton(
+                              child: Text("Cancel"),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                            FlatButton(
+                              child: Text("OK"),
+                              onPressed: () async {
+                                FirebaseStorageAccess.deleteFile(uid + '/' + snapshot.data!.docs[index].id + '.JPG');
+                                await snapshot.data!.docs[index].reference.delete();
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
                   child: Column(
                     children: <Widget>[

@@ -43,4 +43,9 @@ class FirebaseStorageAccess {
     }
     return null;
   }
+
+  static void deleteFile(String path) async {
+    final ref = firebase_storage.FirebaseStorage.instance.ref().child(path);
+    await ref.delete();
+  }
 }
