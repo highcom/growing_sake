@@ -16,7 +16,10 @@ void main() async{
   runApp(const ProviderScope(child: GrowingSakeApp()));
 }
 
+// ユーザーIDプロバイダ
 final uidProvider = StateProvider<String>((ref) => "");
+// 既存データ更新状態プロバイダ
+final updateDetailProvider = StateProvider<int>((ref) => 0);
 
 ///
 /// メイン画面のウィジェット
@@ -64,7 +67,7 @@ class _GrowingSakeWidgetState extends ConsumerState<GrowingSakeWidget> {
   String uid = "";
   bool _fabVisible = false;
   final _pageWidgets = [
-    const SakeHomeViewWidget(color:Colors.white, title:'Home'),
+    SakeHomeViewWidget(color:Colors.white, title:'Home'),
     const SakeTimelineViewWidget(color:Colors.white, title:'Timeline'),
     FirebaseGoogleAuth(),
   ];

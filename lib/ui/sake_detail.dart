@@ -359,6 +359,9 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                         .uploadFile(wuid, docRef.id, XFile(encodeFile!.path));
                   }
 
+                  // データが更新されたことを通知するために値を更新
+                  ref.read(updateDetailProvider.notifier).state++;
+
                   // 詳細画面を終了する
                   Navigator.of(context).pop();
                 },
