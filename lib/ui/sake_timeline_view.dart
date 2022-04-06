@@ -53,9 +53,9 @@ class SakeTimelineViewWidget extends StatelessWidget {
             return GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 1,
-                  crossAxisSpacing: 10.0, // 縦
-                  mainAxisSpacing: 10.0, // 横
-                  childAspectRatio: 2.0),
+                  crossAxisSpacing: 5.0, // 縦
+                  mainAxisSpacing: 5.0, // 横
+                  childAspectRatio: 2.3),
               itemCount: snapshot.data!.docs.length,
               padding: const EdgeInsets.all(5.0),
               itemBuilder: (BuildContext context, int index) {
@@ -66,72 +66,45 @@ class SakeTimelineViewWidget extends StatelessWidget {
                       },
                       child: Row(
                         children: <Widget>[
-                          Image.asset(assetsImage, height: 100, fit: BoxFit.cover,),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Container(
-                                margin: const EdgeInsets.all(4.0),
-                                child: const Text('銘柄名'),
-                              ),
-                              Container(
-                                margin: const EdgeInsets.all(4.0),
-                                child: const Text('サブ銘柄名'),
-                              ),
-                              Container(
-                                margin: const EdgeInsets.all(4.0),
-                                child: const Text('酒舗'),
-                              ),
-                              Container(
-                                margin: const EdgeInsets.all(4.0),
-                                child: const Text('地域名'),
-                              ),
-                              Container(
-                                margin: const EdgeInsets.all(4.0),
-                                child: const Text('特定名称'),
-                              ),
-                            ],
-                          ),
+                          Image.asset(assetsImage, height: 200, fit: BoxFit.cover,),
                           Flexible(child:
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 Container(
-                                  margin: const EdgeInsets.all(4.0),
-                                  child: Text('：' + getSnapshotValue(snapshot.data!.docs[index], 'title'), overflow: TextOverflow.ellipsis,),
+                                  margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                                  child: Text(getSnapshotValue(snapshot.data!.docs[index], 'title'),
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 26,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                  ),
                                 ),
                                 Container(
-                                  margin: const EdgeInsets.all(4.0),
-                                  // child: Text(snapshot.data!.docs[index]['subtitle']),
-                                  child: Text('：' + getSnapshotValue(snapshot.data!.docs[index], 'subtitle'), overflow: TextOverflow.ellipsis,),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.all(4.0),
-                                  // child: Text(snapshot.data!.docs[index]['brewery']),
-                                  child: Text('：' + getSnapshotValue(snapshot.data!.docs[index], 'brewery'), overflow: TextOverflow.ellipsis,),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.all(4.0),
-                                  child: Text('：' + getSnapshotValue(snapshot.data!.docs[index], 'area'), overflow: TextOverflow.ellipsis,),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.all(4.0),
-                                  child: Text('：' + getSnapshotValue(snapshot.data!.docs[index], 'specific'), overflow: TextOverflow.ellipsis,),
+                                  margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                                  child: Text(getSnapshotValue(snapshot.data!.docs[index], 'subtitle'),
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.normal,
+                                      fontSize: 16,
+                                      color: Colors.blueGrey,
+                                    ),
+                                  ),
                                 ),
                               ],
                             )
                           ),
                         ],
                       )),
-                  padding: const EdgeInsets.all(10.0),
                   decoration: BoxDecoration(
                     color: color,
-                    borderRadius: BorderRadius.circular(10),
                     boxShadow: const [
                       BoxShadow(
                         color: Colors.grey,
-                        offset: Offset(5.0, 5.0),
-                        blurRadius: 10.0,
+                        offset: Offset(1.0, 1.0),
+                        blurRadius: 1.0,
                       )
                     ],
                   ),

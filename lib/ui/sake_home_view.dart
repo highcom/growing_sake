@@ -39,11 +39,11 @@ class SakeHomeViewWidget extends HookConsumerWidget {
           return GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
-                crossAxisSpacing: 10.0, // 縦
-                mainAxisSpacing: 10.0, // 横
+                crossAxisSpacing: 5.0, // 縦
+                mainAxisSpacing: 5.0, // 横
                 childAspectRatio: 0.7),
             itemCount: snapshot.data!.docs.length,
-            padding: const EdgeInsets.all(5.0),
+            padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
             itemBuilder: (BuildContext context, int index) {
               // タップされた日本酒に対する詳細画面への遷移処理を定義
               return Container(
@@ -99,15 +99,13 @@ class SakeHomeViewWidget extends HookConsumerWidget {
                       ),
                     ],
                   )),
-                padding: const EdgeInsets.all(10.0),
                 decoration: BoxDecoration(
                   color: color,
-                  borderRadius: BorderRadius.circular(10),
                   boxShadow: const [
                     BoxShadow(
                       color: Colors.grey,
-                      offset: Offset(5.0, 5.0),
-                      blurRadius: 10.0,
+                      offset: Offset(1.0, 1.0),
+                      blurRadius: 1.0,
                     )
                   ],
                 ),

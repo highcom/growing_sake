@@ -28,12 +28,27 @@ class FirebaseGoogleAuth extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final uid = ref.watch(uidProvider);
+    String loginState;
+    bool loginButtonEnable;
+    if (uid.compareTo("") == 0) {
+      loginState = 'ログアウト中';
+      loginButtonEnable = true;
+    } else {
+      loginState = 'ログイン中\n' + user.displayName!;
+      loginButtonEnable = false;
+    }
 
     return Scaffold(
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
+
+            ///
+            /// ログイン状態かどうかを明示しておく
+            ///
+            Text(loginState),
 
             ///
             /// Google認証によるログイン処理ボタン
@@ -45,13 +60,13 @@ class FirebaseGoogleAuth extends HookConsumerWidget {
                   child: const Text('Google認証',
                     style: TextStyle(fontWeight: FontWeight.bold),),
                   textColor: Colors.white,
-                  color: Colors.grey,
+                  color: loginButtonEnable ? Colors.lightGreen : Colors.grey,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
 
                   onPressed: () async {
-
+                    if (!loginButtonEnable) return;
                     // Google認証の部分
                     googleUser = (await _google_signin.signIn())!;
                     googleAuth = await googleUser.authentication;
@@ -67,13 +82,7 @@ class FirebaseGoogleAuth extends HookConsumerWidget {
                       user = result.user!;
                       ref.read(uidProvider.notifier).state = user.uid;
 
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LoginHome(user_id: user.uid),
-                          )
-                      );
-
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('ようこそ' + user.displayName!)));
                     } catch (e) {
                       print(e);
                     }
@@ -90,22 +99,20 @@ class FirebaseGoogleAuth extends HookConsumerWidget {
                   child: const Text('Google認証ログアウト',
                     style: TextStyle(fontWeight: FontWeight.bold),),
                   textColor: Colors.white,
-                  color: Colors.grey,
+                  color: loginButtonEnable ? Colors.grey : Colors.lightGreen,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
 
                   onPressed: () {
+                    if (loginButtonEnable) return;
                     _auth.signOut();
                     _google_signin.signOut();
                     ref.read(uidProvider.notifier).state = "";
-                    print('サインアウトしました。');
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('ログアウトしました')));
                   }
               ),
             ),
-
-            const Text('別のGoogleアカウントでログインしたい場合、一回ログアウトする必要がある。'),
-
           ],
         ),
       ),
