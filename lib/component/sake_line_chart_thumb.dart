@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
-// import 'package:growing_sake/util/app_theme_color.dart';
-// import 'package:numberpicker/numberpicker.dart';
 
 ///
 /// 香りグラフ用ラインチャート
@@ -31,20 +29,11 @@ class _SakeLineChartThumbState extends State<SakeLineChartThumb> with SingleTick
   // 香りデータ入力エリア表示・非表示設定
   bool showPicker = false;
   late AnimationController _controller;
-  // IconData _iconData = Icons.add;
 
-  // 選択日付
-  // late DateTime _selectDateTime;
-  // 選択日付表示用コントローラ
-  // final TextEditingController _selectDate = TextEditingController();
-  // 現在の日付
-  // double _currentDate = 0;
   // 開始日
   double _startDate = 0;
   // 終了日
   double _endDate = 0;
-  // 現在の香りレベル
-  // int _currentAromaLevel = 1;
 
   @override
   void initState() {
@@ -83,25 +72,6 @@ class _SakeLineChartThumbState extends State<SakeLineChartThumb> with SingleTick
         show: false,
       ),
       ///
-      /// グリッド表示設定
-      ///
-      // gridData: FlGridData(
-      //   show: true,
-      //   drawVerticalLine: true,
-      //   getDrawingHorizontalLine: (value) {
-      //     return FlLine(
-      //       color: const Color(0xff37434d),
-      //       strokeWidth: 1,
-      //     );
-      //   },
-      //   getDrawingVerticalLine: (value) {
-      //     return FlLine(
-      //       color: const Color(0xff37434d),
-      //       strokeWidth: 1,
-      //     );
-      //   },
-      // ),
-      ///
       /// 香りデータのラインチャート表示設定
       ///
       borderData: FlBorderData(
@@ -138,55 +108,10 @@ class _SakeLineChartThumbState extends State<SakeLineChartThumb> with SingleTick
         AspectRatio(
           aspectRatio: 2.5,
           child: Container(
-            // decoration: const BoxDecoration(
-            //     borderRadius: BorderRadius.all(
-            //       Radius.circular(18),
-            //     ),
-            //     color: Color(0xffa9c6fd)),
-            // child: Padding(
-            //   padding: const EdgeInsets.only(
-            //       right: 18.0, left: 12.0, top: 24, bottom: 12),
-            //   child: LineChart(mainData()),
-            // ),
             child: LineChart(mainData()),
           ),
         ),
       ],
     );
-    // return Container(
-    // // decoration: const BoxDecoration(
-    // //     borderRadius: BorderRadius.all(
-    // //       Radius.circular(18),
-    //   //     ),
-    //   //     color: Color(0xffa9c6fd)),
-    //   child: Column(
-    //     mainAxisAlignment: MainAxisAlignment.center,
-    //     children: [
-    //       ///
-    //       /// ラインチャート表示エリア
-    //       ///
-    //       Stack(
-    //         children: <Widget>[
-    //           AspectRatio(
-    //             aspectRatio: 2.5,
-    //             child: Container(
-    //               // decoration: const BoxDecoration(
-    //               //     borderRadius: BorderRadius.all(
-    //               //       Radius.circular(18),
-    //               //     ),
-    //               //     color: Color(0xffa9c6fd)),
-    //               // child: Padding(
-    //               //   padding: const EdgeInsets.only(
-    //               //       right: 18.0, left: 12.0, top: 24, bottom: 12),
-    //               //   child: LineChart(mainData()),
-    //               // ),
-    //               child: LineChart(mainData()),
-    //             ),
-    //           ),
-    //         ],
-    //       ),
-    //     ],
-    //   ),
-    // );
   }
 }
