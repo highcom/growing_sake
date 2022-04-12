@@ -68,7 +68,7 @@ class _GrowingSakeWidgetState extends ConsumerState<GrowingSakeWidget> {
   bool _fabVisible = false;
   final _pageWidgets = [
     SakeHomeViewWidget(color:Colors.white, title:'Home'),
-    const SakeTimelineViewWidget(color:Colors.white, title:'Timeline'),
+    SakeTimelineViewWidget(color:Colors.white, title:'Timeline'),
     FirebaseGoogleAuth(),
   ];
 

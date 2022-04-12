@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/rendering.dart';
 import 'package:growing_sake/model/uid_docid_args.dart';
+import 'package:growing_sake/component/sake_radar_chart_thumb.dart';
+import 'package:growing_sake/component/sake_line_chart_thumb.dart';
 
 ///
 /// 日本酒のタイムラインでの一覧表示
@@ -9,8 +12,12 @@ import 'package:growing_sake/model/uid_docid_args.dart';
 class SakeTimelineViewWidget extends StatelessWidget {
   final Color color;
   final String title;
+  // 五味用のレーダーチャート
+  final _sakeRadarChartThumb = SakeRadarChartThumb(fiveFlavorList: const {});
+  // 香グラフ用のラインチャート
+  final _sakeLineChartThumb = SakeLineChartThumb(elapsedList: const [0, 1, 2], levelList: const [10, 5, 3]);
 
-  const SakeTimelineViewWidget({Key? key, required this.color, required this.title}) : super(key: key);
+  SakeTimelineViewWidget({Key? key, required this.color, required this.title}) : super(key: key);
 
   ///
   /// スナップショットから引数で指定された項目の内容を設定する
@@ -91,6 +98,29 @@ class SakeTimelineViewWidget extends StatelessWidget {
                                       fontSize: 16,
                                       color: Colors.blueGrey,
                                     ),
+                                  ),
+                                ),
+                                Flexible(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      ///
+                                      /// 五味のレーダーチャート設定
+                                      ///
+                                      Container(
+                                        constraints: const BoxConstraints(maxWidth: 100),
+                                        alignment: Alignment.center,
+                                        child: _sakeRadarChartThumb,
+                                      ),
+                                      ///
+                                      /// 香りグラフのラインチャート設定
+                                      ///
+                                      Container(
+                                        constraints: const BoxConstraints(maxWidth: 100),
+                                        alignment: Alignment.center,
+                                        child: _sakeLineChartThumb,
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
