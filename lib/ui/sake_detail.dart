@@ -403,7 +403,7 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                           FocusManager.instance.primaryFocus!.unfocus();
                         });
                       },
-                      decoration: TextFieldDecoration('銘柄名'),
+                      decoration: const TextFieldDecoration('銘柄名'),
                     ),
                   ),
                 ),
@@ -411,7 +411,6 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                 // サブ銘柄名テキストフィールド設定
                 //
                 Container(
-                  height: 45,
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                   child: GestureDetector(
                     onTap: () => setFocusScope(context),
@@ -419,7 +418,7 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                       controller: _subtitle,
                       enabled: true,
                       maxLines: 1,
-                      decoration: TextFieldDecoration('サブ銘柄名'),
+                      decoration: const TextFieldDecoration('サブ銘柄名'),
                     ),
                   ),
                 ),
@@ -500,7 +499,7 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                             controller: _brewery,
                             enabled: true,
                             maxLines: 1,
-                            decoration: TextFieldDecoration('酒舗'),
+                            decoration: const TextFieldDecoration('酒舗'),
                           ),
                         ),
                       ),
@@ -515,7 +514,7 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                             controller: _area,
                             enabled: true,
                             maxLines: 1,
-                            decoration: TextFieldDecoration('地域'),
+                            decoration: const TextFieldDecoration('地域'),
                           ),
                         ),
                       ),
@@ -526,7 +525,7 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                       Container(
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                         child: DropdownButtonFormField<String>(
-                          decoration: TextFieldDecoration('特定名称'),
+                          decoration: const TextFieldDecoration('特定名称'),
                           value: _specific.text,
                           onChanged: (value) {
                             setControllerValue(_specific, value);
@@ -556,7 +555,7 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                             inputFormatters: [FilteringTextInputFormatter
                                 .digitsOnly
                             ],
-                            decoration: TextFieldWithSuffixDecoration(
+                            decoration: const TextFieldWithSuffixDecoration(
                                 '精米歩合', '％'),
                           ),
                         ),
@@ -572,7 +571,7 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                             controller: _material,
                             enabled: true,
                             maxLines: 1,
-                            decoration: TextFieldDecoration('原材料'),
+                            decoration: const TextFieldDecoration('原材料'),
                           ),
                         ),
                       ),
@@ -592,7 +591,7 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                             inputFormatters: [FilteringTextInputFormatter
                                 .digitsOnly
                             ],
-                            decoration: TextFieldWithSuffixDecoration(
+                            decoration: const TextFieldWithSuffixDecoration(
                                 '内容量', 'ml'),
                           ),
                         ),
@@ -614,7 +613,7 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                       readOnly: true,
                       maxLines: 1,
                       onTap: () => selectDate(context),
-                      decoration: TextFieldDecoration('購入日'),
+                      decoration: const TextFieldDecoration('購入日'),
                     ),
                   ),
                 ),
@@ -632,7 +631,7 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                       maxLines: 1,
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      decoration: TextFieldWithSuffixDecoration('保管温度', '度'),
+                      decoration: const TextFieldWithSuffixDecoration('保管温度', '度'),
                     ),
                   ),
                 ),
@@ -642,7 +641,7 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                 Container(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                   child: DropdownButtonFormField<String>(
-                    decoration: TextFieldDecoration('飲み方'),
+                    decoration: const TextFieldDecoration('飲み方'),
                     value: _drinking.text,
                     onChanged: (value) {
                       setControllerValue(_drinking, value);
@@ -677,15 +676,13 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
 /// 詳細画面でのテキストフィールドのデコレーション設定を設定する
 ///
 class TextFieldDecoration extends InputDecoration {
-  TextFieldDecoration(String text) : super(
+  const TextFieldDecoration(String text) : super(
     labelText: text,
-    floatingLabelBehavior: FloatingLabelBehavior.auto,
+    hintText: '未記入',
+    hintStyle: const TextStyle(color: Color(0xFFC0C0C0)),
+    floatingLabelBehavior: FloatingLabelBehavior.always,
     filled: true,
-    fillColor: AppThemeColor.baseColor.shade50,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide.none,
-    ),
+    border: const UnderlineInputBorder(),
   );
 }
 
@@ -694,15 +691,13 @@ class TextFieldDecoration extends InputDecoration {
 /// 単位などをサフィックスで付けるようなテキストフィールドのデコレーションを設定する
 ///
 class TextFieldWithSuffixDecoration extends InputDecoration {
-  TextFieldWithSuffixDecoration(String text, String suffix) : super(
+  const TextFieldWithSuffixDecoration(String text, String suffix) : super(
     labelText: text,
+    hintText: '未記入',
+    hintStyle: const TextStyle(color: Color(0xFFC0C0C0)),
     suffixText: suffix,
-    floatingLabelBehavior: FloatingLabelBehavior.auto,
+    floatingLabelBehavior: FloatingLabelBehavior.always,
     filled: true,
-    fillColor: AppThemeColor.baseColor.shade50,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide.none,
-    ),
+    border: const UnderlineInputBorder(),
   );
 }

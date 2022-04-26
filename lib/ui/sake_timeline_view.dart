@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:growing_sake/model/uid_docid_args.dart';
 import 'package:growing_sake/component/sake_radar_chart_thumb.dart';
 import 'package:growing_sake/component/sake_line_chart_thumb.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 ///
 /// 日本酒のタイムラインでの一覧表示
@@ -78,28 +79,35 @@ class SakeTimelineViewWidget extends StatelessWidget {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                Container(
-                                  margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                  child: Text(getSnapshotValue(snapshot.data!.docs[index], 'title'),
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 26,
-                                      color: Theme.of(context).primaryColor,
+                                Row(children: <Widget>[
+                                  SvgPicture.asset('images/sakura.svg', height: 36, width: 36,),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                    Container(
+                                      margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                                      child: Text(getSnapshotValue(snapshot.data!.docs[index], 'title'),
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 26,
+                                          color: Theme.of(context).primaryColor,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                  child: Text(getSnapshotValue(snapshot.data!.docs[index], 'subtitle'),
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.normal,
-                                      fontSize: 16,
-                                      color: Colors.blueGrey,
+                                    Container(
+                                      margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                                      child: Text(getSnapshotValue(snapshot.data!.docs[index], 'subtitle'),
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.normal,
+                                          fontSize: 16,
+                                          color: Colors.blueGrey,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
+                                  ],),
+                                ],),
                                 Flexible(
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,

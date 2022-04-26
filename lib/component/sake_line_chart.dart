@@ -226,10 +226,11 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(
-            Radius.circular(18),
-          ),
-          color: Color(0xffa9c6fd)),
+        borderRadius: BorderRadius.all(
+          Radius.circular(18),
+        ),
+        color: Color(0xfff0f0f0),
+      ),
       child: Column(
         children: [
           ///
@@ -276,7 +277,7 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
                         readOnly: true,
                         maxLines: 1,
                         onTap: () => selectDate(context),
-                        decoration: TextFieldDecoration('日付'),
+                        decoration: const TextFieldDecoration('日付'),
                       ),
                     ),
                   ),
@@ -303,7 +304,6 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
                   padding: const EdgeInsets.fromLTRB(0, 0, 12, 0),
                   child: RaisedButton(
                     child: const Text('追加'),
-                    color: AppThemeColor.baseColor.shade50,
                     shape: const OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
@@ -340,7 +340,7 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
                       borderRadius: BorderRadius.all(
                         Radius.circular(18),
                       ),
-                      color: Color(0xffa9c6fd)),
+                      color: Color(0xfff0f0f0)),
                   child: Padding(
                     padding: const EdgeInsets.only(
                         right: 18.0, left: 12.0, top: 24, bottom: 12),
@@ -360,13 +360,12 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
 /// テキストフィールドのデコレーション設定
 ///
 class TextFieldDecoration extends InputDecoration {
-  TextFieldDecoration(String text) : super(
+  const TextFieldDecoration(String text) : super(
     labelText: text,
-    floatingLabelBehavior: FloatingLabelBehavior.auto,
+    hintText: '未入力',
+    hintStyle: const TextStyle(color: Color(0xFFC0C0C0)),
+    floatingLabelBehavior: FloatingLabelBehavior.always,
     filled: true,
-    fillColor: AppThemeColor.baseColor.shade50,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
-    ),
+    border: const UnderlineInputBorder(),
   );
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:growing_sake/main.dart';
-import 'package:growing_sake/util/login_home.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 ///

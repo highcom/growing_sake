@@ -148,15 +148,12 @@ class _CandidateListState extends State<CandidateListWidget> {
                 onChanged: (value) {
                   _runFilter(value);
                 },
-                decoration: InputDecoration(
-                  labelText: _title,
-                  floatingLabelBehavior: FloatingLabelBehavior.auto,
+                decoration: const InputDecoration(
+                  hintText: '未記入',
+                  hintStyle: TextStyle(color: Color(0xFFC0C0C0)),
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
                   filled: true,
-                  fillColor: AppThemeColor.baseColor.shade50,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
+                  border: UnderlineInputBorder(),
                 ),
               ),
             ),
