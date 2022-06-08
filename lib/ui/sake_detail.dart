@@ -71,6 +71,9 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
     '飛び切り燗(55℃)',
   ];
 
+  // タイムラインMAX登録数
+  final int timeline_max = 10;
+
   // FirebaseStorageへのアップロードタスクオブジェクト
   firebase_storage.UploadTask? uploadTask;
 
@@ -303,6 +306,7 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                 icon: const Icon(Icons.check),
                 onPressed: () async {
                   DocumentReference docRef;
+                  DocumentReference timelineDocRef;
                   String wuid;
                   // 新規作成の場合は、自分のUIDにドキュメントを保存するようにuidを取得する
                   if (uid == 'Base') {
@@ -350,6 +354,44 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                         'fiveFlavorList': _fiveFlavorList,
                         'aromaElapsedList': FieldValue.arrayUnion(_aromaElapsedList),
                         'aromaLevelList': FieldValue.arrayUnion(_aromaLevelList),
+                  });
+
+                  ///
+                  /// タイムラインに既に10レコード以上ある場合には、10レコード未満まで削除する
+                  ///
+                  QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('Timeline').get();
+                  if (snapshot.docs.length >= timeline_max) {
+                    int count = 1;
+                    for (var doc in snapshot.docs) {
+                      if (count >= timeline_max) {
+                        doc.reference.delete();
+                      }
+                      count++;
+                    }
+                  }
+
+                  ///
+                  /// 登録したdocIdをFirestoreのTimelineにも反映する
+                  ///
+                  timelineDocRef = FirebaseFirestore.instance.collection('Timeline').doc();
+                  Timestamp createAtTimestamp = Timestamp.fromDate(DateTime.now());
+                  await timelineDocRef.set({
+                    'uid': wuid,
+                    'createAt': createAtTimestamp,
+                    'title': _title.text,
+                    'subtitle': _subtitle.text,
+                    'brewery': _brewery.text,
+                    'area': _area.text,
+                    'specific': _specific.text,
+                    'polishing': _polishing.text,
+                    'material': _material.text,
+                    'capacity': _capacity.text,
+                    'purchase': _purchaseDateTime,
+                    'temperature': _temperature.text,
+                    'drinking': _drinking.text,
+                    'fiveFlavorList': _fiveFlavorList,
+                    'aromaElapsedList': FieldValue.arrayUnion(_aromaElapsedList),
+                    'aromaLevelList': FieldValue.arrayUnion(_aromaLevelList),
                   });
 
                   // 選択された画像ファイルをFirebaseStorageへアップロードする

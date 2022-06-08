@@ -43,7 +43,7 @@ class SakeTimelineViewWidget extends StatelessWidget {
     var assetsImage = "images/ic_sake.png";
     return Scaffold(
       body: StreamBuilder(
-          stream: FirebaseFirestore.instance.collection('Brands').snapshots(),
+          stream: FirebaseFirestore.instance.collection('Timeline').snapshots(),
           builder: (BuildContext context,
               ///
               /// データ取得中は処理中のプログレスを表示
@@ -70,7 +70,7 @@ class SakeTimelineViewWidget extends StatelessWidget {
                 return Container(
                   child: GestureDetector(
                       onTap: () {
-                        Navigator.of(context).pushNamed('/sake_detail', arguments: UidDocIdArgs('Brands', snapshot.data!.docs[index].id));
+                        Navigator.of(context).pushNamed('/sake_detail', arguments: UidDocIdArgs('Timeline', snapshot.data!.docs[index].id));
                       },
                       child: Row(
                         children: <Widget>[
