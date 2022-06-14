@@ -71,6 +71,7 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
     '飛び切り燗(55℃)',
   ];
 
+  // TODO:ある程度Timelineが実装できたらサイズを100にする
   // タイムラインMAX登録数
   final int timeline_max = 10;
 
@@ -357,9 +358,9 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                   });
 
                   ///
-                  /// タイムラインに既に10レコード以上ある場合には、10レコード未満まで削除する
+                  /// タイムラインに既に10レコード以上ある場合には、古い方から10レコード未満まで削除する
                   ///
-                  QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('Timeline').get();
+                  QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('Timeline').orderBy('createAt', descending: true).get();
                   if (snapshot.docs.length >= timeline_max) {
                     int count = 1;
                     for (var doc in snapshot.docs) {
@@ -377,6 +378,7 @@ class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTicker
                   Timestamp createAtTimestamp = Timestamp.fromDate(DateTime.now());
                   await timelineDocRef.set({
                     'uid': wuid,
+                    'orgDocId': docRef.id,
                     'createAt': createAtTimestamp,
                     'title': _title.text,
                     'subtitle': _subtitle.text,

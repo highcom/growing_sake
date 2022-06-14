@@ -4,7 +4,6 @@ import 'package:growing_sake/main.dart';
 import 'package:growing_sake/model/uid_docid_args.dart';
 import 'package:growing_sake/util/firebase_storage_access.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 ///
 /// 日本酒一覧表示画面
@@ -95,7 +94,7 @@ class SakeHomeViewWidget extends HookConsumerWidget {
                         margin: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                         child: Row(
                           children: [
-                            SvgPicture.asset('images/sakura.svg', height: 24, width: 24,),
+                            Image.asset('images/sakura.png', height: 24, width: 24,),
                             Text(
                               snapshot.data!.docs[index]['title'],
                               style: const TextStyle(fontSize: 18),

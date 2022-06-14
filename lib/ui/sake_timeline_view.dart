@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:growing_sake/util/firebase_storage_access.dart';
 import 'package:flutter/rendering.dart';
 import 'package:growing_sake/model/uid_docid_args.dart';
 import 'package:growing_sake/component/sake_radar_chart_thumb.dart';
 import 'package:growing_sake/component/sake_line_chart_thumb.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 ///
 /// 日本酒のタイムラインでの一覧表示
@@ -43,7 +43,7 @@ class SakeTimelineViewWidget extends StatelessWidget {
     var assetsImage = "images/ic_sake.png";
     return Scaffold(
       body: StreamBuilder(
-          stream: FirebaseFirestore.instance.collection('Timeline').snapshots(),
+          stream: FirebaseFirestore.instance.collection('Timeline').orderBy('createAt', descending: true).snapshots(),
           builder: (BuildContext context,
               ///
               /// データ取得中は処理中のプログレスを表示
@@ -63,7 +63,7 @@ class SakeTimelineViewWidget extends StatelessWidget {
                   crossAxisCount: 1,
                   crossAxisSpacing: 5.0, // 縦
                   mainAxisSpacing: 5.0, // 横
-                  childAspectRatio: 2.3),
+                  childAspectRatio: 2.2),
               itemCount: snapshot.data!.docs.length,
               padding: const EdgeInsets.all(5.0),
               itemBuilder: (BuildContext context, int index) {
@@ -74,39 +74,49 @@ class SakeTimelineViewWidget extends StatelessWidget {
                       },
                       child: Row(
                         children: <Widget>[
-                          Image.asset(assetsImage, height: 200, fit: BoxFit.cover,),
+                          FutureBuilder<String?>(
+                            future: FirebaseStorageAccess.downloadFile(snapshot.data!.docs[index].get('uid') + '/' + snapshot.data!.docs[index].get('orgDocId') + '.JPG'),
+                            builder: (context, imageSnapshot) => imageSnapshot.hasData ? InkWell(
+                              child: Image.network(
+                                imageSnapshot.data as String,
+                                fit: BoxFit.cover,
+                              ),
+                            ) : Image.asset(assetsImage, fit: BoxFit.cover,),
+                          ),
                           Flexible(child:
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                Row(children: <Widget>[
-                                  SvgPicture.asset('images/sakura.svg', height: 36, width: 36,),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: <Widget>[
-                                    Container(
-                                      margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                      child: Text(getSnapshotValue(snapshot.data!.docs[index], 'title'),
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 26,
-                                          color: Theme.of(context).primaryColor,
+                                      Container(
+                                        margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                                        child: Text(getSnapshotValue(snapshot.data!.docs[index], 'title'),
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 26,
+                                            color: Theme.of(context).primaryColor,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Container(
-                                      margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                      child: Text(getSnapshotValue(snapshot.data!.docs[index], 'subtitle'),
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 16,
-                                          color: Colors.blueGrey,
-                                        ),
-                                      ),
-                                    ),
+                                      Image.asset('images/sakura.png', height: 36, width: 36,),
                                   ],),
+                                  Container(
+                                    margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                                    child: Text(getSnapshotValue(snapshot.data!.docs[index], 'subtitle'),
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 16,
+                                        color: Colors.blueGrey,
+                                      ),
+                                    ),
+                                  ),
                                 ],),
                                 Flexible(
                                   child: Row(
@@ -115,18 +125,18 @@ class SakeTimelineViewWidget extends StatelessWidget {
                                       ///
                                       /// 五味のレーダーチャート設定
                                       ///
-                                      Container(
-                                        constraints: const BoxConstraints(maxWidth: 100),
-                                        alignment: Alignment.center,
-                                        child: _sakeRadarChartThumb,
+                                      Expanded(child: Container(
+                                          alignment: Alignment.center,
+                                          child: _sakeRadarChartThumb,
+                                        ),
                                       ),
                                       ///
                                       /// 香りグラフのラインチャート設定
                                       ///
-                                      Container(
-                                        constraints: const BoxConstraints(maxWidth: 100),
-                                        alignment: Alignment.center,
-                                        child: _sakeLineChartThumb,
+                                      Expanded(child: Container(
+                                          alignment: Alignment.center,
+                                          child: _sakeLineChartThumb,
+                                        ),
                                       ),
                                     ],
                                   ),
