@@ -14,9 +14,9 @@ class SakeTimelineViewWidget extends StatelessWidget {
   final Color color;
   final String title;
   // 五味用のレーダーチャート
-  final _sakeRadarChartThumb = SakeRadarChartThumb(fiveFlavorList: const {});
+  SakeRadarChartThumb _sakeRadarChartThumb = SakeRadarChartThumb(fiveFlavorList: const {});
   // 香グラフ用のラインチャート
-  final _sakeLineChartThumb = SakeLineChartThumb(elapsedList: const [0, 1, 2], levelList: const [10, 5, 3]);
+  SakeLineChartThumb _sakeLineChartThumb = SakeLineChartThumb(elapsedList: const [0, 1], levelList: const [0, 0]);
 
   SakeTimelineViewWidget({Key? key, required this.color, required this.title}) : super(key: key);
 
@@ -45,10 +45,10 @@ class SakeTimelineViewWidget extends StatelessWidget {
       body: StreamBuilder(
           stream: FirebaseFirestore.instance.collection('Timeline').orderBy('createAt', descending: true).snapshots(),
           builder: (BuildContext context,
-              ///
-              /// データ取得中は処理中のプログレスを表示
-              ///
-              AsyncSnapshot<QuerySnapshot> snapshot) {
+            ///
+            /// データ取得中は処理中のプログレスを表示
+            ///
+            AsyncSnapshot<QuerySnapshot> snapshot) {
             if (!snapshot.hasData) {
               return const Center(
                 child: CircularProgressIndicator(),
@@ -67,6 +67,17 @@ class SakeTimelineViewWidget extends StatelessWidget {
               itemCount: snapshot.data!.docs.length,
               padding: const EdgeInsets.all(5.0),
               itemBuilder: (BuildContext context, int index) {
+                // 五味データがある場合にはデータを設定する
+                if (snapshot.data!.docs[index].get('fiveFlavorList') != null) {
+                  _sakeRadarChartThumb = SakeRadarChartThumb(fiveFlavorList: snapshot.data!.docs[index].get('fiveFlavorList').cast<String, int>() as Map<String, int>);
+                }
+                // 香りデータがある場合にはデータを設定する
+                if (snapshot.data!.docs[index].get('aromaElapsedList') != null && snapshot.data!.docs[index].get('aromaLevelList') != null) {
+                  _sakeLineChartThumb = SakeLineChartThumb(
+                      elapsedList: snapshot.data!.docs[index].get('aromaElapsedList').cast<double>() as List<double>,
+                      levelList: snapshot.data!.docs[index].get('aromaLevelList').cast<double>() as List<double>);
+                }
+
                 return Container(
                   child: GestureDetector(
                       onTap: () {
@@ -126,6 +137,7 @@ class SakeTimelineViewWidget extends StatelessWidget {
                                       /// 五味のレーダーチャート設定
                                       ///
                                       Expanded(child: Container(
+                                          padding: const EdgeInsets.fromLTRB(2.0, 0, 0, 0),
                                           alignment: Alignment.center,
                                           child: _sakeRadarChartThumb,
                                         ),
@@ -134,7 +146,8 @@ class SakeTimelineViewWidget extends StatelessWidget {
                                       /// 香りグラフのラインチャート設定
                                       ///
                                       Expanded(child: Container(
-                                          alignment: Alignment.center,
+                                        padding: const EdgeInsets.fromLTRB(0, 0, 2.0, 0),
+                                        alignment: Alignment.center,
                                           child: _sakeLineChartThumb,
                                         ),
                                       ),
