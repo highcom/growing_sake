@@ -81,7 +81,7 @@ class SakeTimelineViewWidget extends StatelessWidget {
                 return Container(
                   child: GestureDetector(
                       onTap: () {
-                        Navigator.of(context).pushNamed('/sake_detail', arguments: UidDocIdArgs('Timeline', snapshot.data!.docs[index].id));
+                        Navigator.of(context).pushNamed('/sake_detail_reference', arguments: UidDocIdArgs('Timeline', snapshot.data!.docs[index].id));
                       },
                       child: Row(
                         children: <Widget>[

@@ -19,12 +19,12 @@ import 'package:image/image.dart' as img;
 ///
 /// 日本酒に対する詳細内容の表示
 ///
-class SakeDetailWidget extends StatefulHookConsumerWidget {
+class SakeDetailEditWidget extends StatefulHookConsumerWidget {
   final arguments;
-  const SakeDetailWidget({Key? key, required this.arguments}) : super(key: key);
+  const SakeDetailEditWidget({Key? key, required this.arguments}) : super(key: key);
 
   @override
-  ConsumerState<SakeDetailWidget> createState() => _SakeDetailState();
+  ConsumerState<SakeDetailEditWidget> createState() => _SakeDetailEditState();
 }
 
 // 基本
@@ -43,7 +43,7 @@ class SakeDetailWidget extends StatefulHookConsumerWidget {
 //  保管温度
 //  飲み方
 //  香りグラフ
-class _SakeDetailState extends ConsumerState<SakeDetailWidget> with SingleTickerProviderStateMixin {
+class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with SingleTickerProviderStateMixin {
   // 特定名称リスト
   List<String> specificList = [
     '名称',

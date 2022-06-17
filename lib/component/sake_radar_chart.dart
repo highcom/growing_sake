@@ -12,9 +12,10 @@ const baseColor = Color(0x44afafaf);
 class SakeRadarChart extends StatefulWidget {
   final String title;
   final Map<String, int> fiveFlavorList;
+  final editEnable;
   final FiveFlavorParameter fiveFlavorParameter = FiveFlavorParameter();
 
-  SakeRadarChart({Key? key, required this.title, required this.fiveFlavorList}) : super(key: key);
+  SakeRadarChart({Key? key, required this.title, required this.fiveFlavorList, this.editEnable = true}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _SakeRadarChartState();
@@ -290,7 +291,7 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
                         setState(() {
                           selectedDataSetIndex = -1;
                         });
-                        if (response != null) {
+                        if (widget.editEnable && response != null) {
                           FiveFlavorParameter? returnParams = await showInputDialog(context, widget.fiveFlavorParameter);
                           setState(() {
                             if (returnParams != null) {

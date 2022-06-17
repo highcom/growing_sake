@@ -14,8 +14,9 @@ class SakeLineChart extends StatefulWidget {
   final List<double> elapsedList;
   final List<double> levelList;
   final List<FlSpot> aromaDataList = [];
+  final editEnable;
 
-  SakeLineChart({Key? key, required this.elapsedList, required this.levelList}) : super(key: key);
+  SakeLineChart({Key? key, required this.elapsedList, required this.levelList, this.editEnable = true}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _SakeLineChartState();
@@ -239,6 +240,7 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
           Container(
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
             alignment: Alignment.centerLeft,
+            height: widget.editEnable ? null : 0,
             child: ButtonTheme(
               child: OutlineButton.icon(
                 color: AppThemeColor.baseColor,

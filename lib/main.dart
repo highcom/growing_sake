@@ -4,7 +4,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:growing_sake/model/uid_docid_args.dart';
 import 'package:growing_sake/util/app_theme_color.dart';
 import 'package:growing_sake/component/candidate_list.dart';
-import 'package:growing_sake/ui/sake_detail.dart';
+import 'package:growing_sake/ui/sake_detail_reference.dart';
+import 'package:growing_sake/ui/sake_detail_edit.dart';
 import 'package:growing_sake/ui/sake_home_view.dart';
 import 'package:growing_sake/ui/sake_timeline_view.dart';
 import 'package:growing_sake/util/firebase_google_auth.dart';
@@ -38,11 +39,12 @@ class GrowingSakeApp extends StatelessWidget {
       ),
       onGenerateRoute: (RouteSettings settings) {
         var routes = <String, WidgetBuilder>{
-          '/sake_detail': (BuildContext context) => SakeDetailWidget(arguments: settings.arguments),
+          '/sake_detail_edit': (BuildContext context) => SakeDetailEditWidget(arguments: settings.arguments),
+          '/sake_detail_reference': (BuildContext context) => SakeDetailReferenceWidget(arguments: settings.arguments),
           '/candidate_list': (BuildContext context) => CandidateListWidget(arguments: settings.arguments),
         };
 
-        WidgetBuilder builder = routes[settings.name] ?? routes['/sake_detail']!;
+        WidgetBuilder builder = routes[settings.name] ?? routes['/sake_detail_edit']!;
 
         return MaterialPageRoute(builder: (ctx) => builder(ctx));
       },
@@ -74,7 +76,7 @@ class _GrowingSakeWidgetState extends ConsumerState<GrowingSakeWidget> {
 
   void _DetailSakeTransition() {
     setState(() {
-      Navigator.of(context).pushNamed("/sake_detail", arguments: UidDocIdArgs('Base', 'defaultDoc'));
+      Navigator.of(context).pushNamed("/sake_detail_edit", arguments: UidDocIdArgs('Base', 'defaultDoc'));
     });
   }
 
