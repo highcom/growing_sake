@@ -33,6 +33,8 @@ class _SakeDetailReferenceWidgetState extends State<SakeDetailReferenceWidget> w
   late String uid;
   // 日本酒のドキュメントID
   late String docId;
+  // 編集画面への遷移
+  late bool editEnable;
 
   // 香グラフ用のラインチャート
   late SakeLineChart _sakeLineChart;
@@ -56,6 +58,7 @@ class _SakeDetailReferenceWidgetState extends State<SakeDetailReferenceWidget> w
     final UidDocIdArgs uidDocIdArgs = widget.arguments as UidDocIdArgs;
     uid = uidDocIdArgs.uid;
     docId = uidDocIdArgs.docId;
+    editEnable = uidDocIdArgs.editEnable;
     firstTime = true;
     _controller = AnimationController(
       vsync: this,
@@ -150,14 +153,15 @@ class _SakeDetailReferenceWidgetState extends State<SakeDetailReferenceWidget> w
               ///
               /// 変更確定処理用のチェックボタン設定
               ///
-              IconButton(
-                icon: const Icon(Icons.edit),
-                onPressed: () {
-                  // TODO:タイムラインから来る場合は不要
-                  // TODO:ホームからの場合は最初から編集の方が良いか検討
-                  // 編集画面に遷移する
-                  Navigator.of(context).pushNamed('/sake_detail_edit', arguments: UidDocIdArgs(uid, docId));
-                },
+              Visibility(
+                visible: editEnable,
+                child: IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () {
+                    // 編集画面に遷移する
+                    Navigator.of(context).pushNamed('/sake_detail_edit', arguments: UidDocIdArgs(uid, docId, false));
+                  },
+                ),
               ),
             ],
           ),

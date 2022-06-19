@@ -50,7 +50,7 @@ class SakeHomeViewWidget extends HookConsumerWidget {
                 child: GestureDetector(
                   onTap: () {
                     // タップされた場合は詳細画面に遷移する
-                    Navigator.of(context).pushNamed('/sake_detail_edit', arguments: UidDocIdArgs(uid, snapshot.data!.docs[index].id));
+                    Navigator.of(context).pushNamed('/sake_detail_reference', arguments: UidDocIdArgs(uid, snapshot.data!.docs[index].id, true));
                   },
                   onLongPress: () {
                     // 長押しされた場合は削除ダイアログを表示する

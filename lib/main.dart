@@ -76,7 +76,7 @@ class _GrowingSakeWidgetState extends ConsumerState<GrowingSakeWidget> {
 
   void _DetailSakeTransition() {
     setState(() {
-      Navigator.of(context).pushNamed("/sake_detail_edit", arguments: UidDocIdArgs('Base', 'defaultDoc'));
+      Navigator.of(context).pushNamed("/sake_detail_edit", arguments: UidDocIdArgs('Base', 'defaultDoc', false));
     });
   }
 
