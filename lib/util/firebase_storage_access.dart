@@ -46,6 +46,12 @@ class FirebaseStorageAccess {
 
   static void deleteFile(String path) async {
     final ref = firebase_storage.FirebaseStorage.instance.ref().child(path);
-    await ref.delete();
+    try {
+      await ref.delete();
+    } on firebase_storage.FirebaseException catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
   }
 }
