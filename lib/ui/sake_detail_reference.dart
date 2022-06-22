@@ -1,27 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:growing_sake/main.dart';
 import 'package:growing_sake/model/uid_docid_args.dart';
 import 'package:growing_sake/util/app_theme_color.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:growing_sake/util/firebase_storage_access.dart';
 import 'package:growing_sake/component/sake_line_chart.dart';
 import 'package:growing_sake/component/sake_radar_chart.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 ///
 /// 日本酒に対する詳細内容の表示(参照のみ)
 ///
-class SakeDetailReferenceWidget extends StatefulWidget {
+class SakeDetailReferenceWidget extends StatefulHookConsumerWidget {
   final arguments;
   const SakeDetailReferenceWidget({Key? key, required this.arguments}) : super(key: key);
 
   @override
-  State<SakeDetailReferenceWidget> createState() => _SakeDetailReferenceWidgetState();
+  ConsumerState<SakeDetailReferenceWidget> createState() => _SakeDetailReferenceWidgetState();
 }
 
-class _SakeDetailReferenceWidgetState extends State<SakeDetailReferenceWidget> with SingleTickerProviderStateMixin {
+class _SakeDetailReferenceWidgetState extends ConsumerState<SakeDetailReferenceWidget> with SingleTickerProviderStateMixin {
   // 初回データ取得か？
   bool firstTime = false;
+  // 編集画面からの更新通知用データ
+  int updateDetail = 0;
 
   // 詳細内容の表示非表示設定
   bool showPicker = false;
@@ -35,6 +40,9 @@ class _SakeDetailReferenceWidgetState extends State<SakeDetailReferenceWidget> w
   late String docId;
   // 編集画面への遷移
   late bool editEnable;
+
+  // 画像オブジェクト
+  late Widget _imageObject;
 
   // 香グラフ用のラインチャート
   late SakeLineChart _sakeLineChart;
@@ -80,6 +88,7 @@ class _SakeDetailReferenceWidgetState extends State<SakeDetailReferenceWidget> w
     // スナップショットから各種パラメータを取得
     DocumentSnapshot snapshot = await future;
     if (firstTime == true) {
+      _imageObject = getImageObject();
       Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
       _title = data['title'] as String;
       _subtitle = data['subtitle'] as String;
@@ -130,8 +139,42 @@ class _SakeDetailReferenceWidgetState extends State<SakeDetailReferenceWidget> w
     });
   }
 
+  ///
+  /// 値を再取得してWidgetを更新する
+  ///
+  void updateWidget() {
+    setState(() {
+      firstTime = true;
+      _imageObject = getImageObject();
+      getBrandData();
+    });
+  }
+
+  ///
+  /// FirebaseStorageから指定されたIDの画像を取得する
+  ///
+  Widget getImageObject() {
+    return FutureBuilder<String?>(
+      future: FirebaseStorageAccess.downloadFile(uid + '/' + docId + '.JPG'),
+      builder: (context, imageSnapshot) => imageSnapshot.hasData ?
+      // FirebaseStorageに画像があれば表示
+      InkWell(
+        child: Image.network(
+          imageSnapshot.data as String,
+          fit: BoxFit.cover,
+        ),
+        // 選択画像が無ければアイコン画像を表示
+      ) : Image.asset('images/ic_sake.png', fit: BoxFit.cover,),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // 編集画面で更新されたら値を取得してリビルド
+    ref.listen(updateDetailProvider, (previous, next) {
+      updateWidget();
+    });
+
     return FutureBuilder<DocumentSnapshot>(
       future: getBrandData(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
@@ -207,18 +250,7 @@ class _SakeDetailReferenceWidgetState extends State<SakeDetailReferenceWidget> w
                 Container(
                   padding: const EdgeInsets.all(8),
                   child: GestureDetector(
-                    child: FutureBuilder<String?>(
-                      future: FirebaseStorageAccess.downloadFile(uid + '/' + docId + '.JPG'),
-                      builder: (context, imageSnapshot) => imageSnapshot.hasData ?
-                      // FirebaseStorageに画像があれば表示
-                      InkWell(
-                        child: Image.network(
-                          imageSnapshot.data as String,
-                          fit: BoxFit.cover,
-                        ),
-                      // 選択画像が無ければアイコン画像を表示
-                      ) : Image.asset('images/ic_sake.png', fit: BoxFit.cover,),
-                    ),
+                    child: _imageObject,
                   ),
                 ),
                 ///

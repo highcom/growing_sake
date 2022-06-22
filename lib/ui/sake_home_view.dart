@@ -12,7 +12,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class SakeHomeViewWidget extends HookConsumerWidget {
   final Color color;
   final String title;
-  int updateDetail = 0;
 
   SakeHomeViewWidget({Key? key, required this.color, required this.title}) : super(key: key);
 
@@ -20,7 +19,6 @@ class SakeHomeViewWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
 
     final String uid = ref.watch(uidProvider);
-    updateDetail = ref.watch(updateDetailProvider);
     return Scaffold(
       body: uid == "" ? const Center(child: Text("メニューからログインして下さい")) : StreamBuilder(
         stream: FirebaseFirestore.instance.collection(uid).snapshots(),

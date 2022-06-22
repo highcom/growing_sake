@@ -398,16 +398,21 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
 
                   // 選択された画像ファイルをFirebaseStorageへアップロードする
                   if (encodeFile != null) {
-                    firebase_storage
-                        .UploadTask? task = await FirebaseStorageAccess
-                        .uploadFile(wuid, docRef.id, XFile(encodeFile!.path));
+                    firebase_storage.UploadTask? uploadTask = await FirebaseStorageAccess.uploadFile(wuid, docRef.id, XFile(encodeFile!.path));
+                    uploadTask!.whenComplete(() {
+                      // データが更新されたことを通知するために値を更新
+                      ref.read(updateDetailProvider.notifier).state++;
+                      // 詳細画面を終了する
+                      Navigator.of(context).pop();
+                    });
+                  } else {
+                    // データが更新されたことを通知するために値を更新
+                    ref.read(updateDetailProvider.notifier).state++;
+
+                    // 詳細画面を終了する
+                    Navigator.of(context).pop();
                   }
 
-                  // データが更新されたことを通知するために値を更新
-                  ref.read(updateDetailProvider.notifier).state++;
-
-                  // 詳細画面を終了する
-                  Navigator.of(context).pop();
                 },
               ),
             ],
