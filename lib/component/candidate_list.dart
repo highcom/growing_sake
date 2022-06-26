@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:growing_sake/model/brand.dart';
 import 'package:growing_sake/model/brewery.dart';
 import 'package:growing_sake/model/area.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'dart:convert' show json;
 @JsonSerializable()
@@ -115,76 +116,95 @@ class _CandidateListState extends State<CandidateListWidget> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-    onWillPop: () async {
-      // フォーカスを外す方でpopするので戻るボタンは無効化する
-      _focusNode.unfocus();
-      return false;
-    },
-    child: Scaffold(
-      appBar: AppBar(
-        title: const Text('Sake Detail'),
-        automaticallyImplyLeading: true,
-      ),
-      body: Column(
-        children: [
-          ///
-          /// 日本酒銘柄検索用テキストフィールド
-          ///
-          Container(
-            padding: const EdgeInsets.all(8),
-            child: GestureDetector(
-              onTap: () {
-                final FocusScopeNode currentScope = FocusScope.of(context);
-                if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
-                  FocusManager.instance.primaryFocus!.unfocus();
-                }
-              },
-              child: TextField(
-                enabled: true,
-                autofocus: true,
-                maxLines: 1,
-                focusNode: _focusNode,
-                controller: _nameController,
-                onChanged: (value) {
-                  _runFilter(value);
+      onWillPop: () async {
+        // フォーカスを外す方でpopするので戻るボタンは無効化する
+        _focusNode.unfocus();
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Sake Detail'),
+          automaticallyImplyLeading: true,
+        ),
+        body: Column(
+          children: [
+            ///
+            /// 日本酒銘柄検索用テキストフィールド
+            ///
+            Container(
+              padding: const EdgeInsets.all(8),
+              child: GestureDetector(
+                onTap: () {
+                  final FocusScopeNode currentScope = FocusScope.of(context);
+                  if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
+                    FocusManager.instance.primaryFocus!.unfocus();
+                  }
                 },
-                decoration: const InputDecoration(
-                  hintText: '未記入',
-                  hintStyle: TextStyle(color: Color(0xFFC0C0C0)),
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
-                  filled: true,
-                  border: UnderlineInputBorder(),
+                child: TextField(
+                  enabled: true,
+                  autofocus: true,
+                  maxLines: 1,
+                  focusNode: _focusNode,
+                  controller: _nameController,
+                  onChanged: (value) {
+                    _runFilter(value);
+                  },
+                  decoration: const InputDecoration(
+                    hintText: '未記入',
+                    hintStyle: TextStyle(color: Color(0xFFC0C0C0)),
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    filled: true,
+                    border: UnderlineInputBorder(),
+                  ),
                 ),
               ),
             ),
-          ),
-          ///
-          /// 日本酒銘柄一覧表示リスト
-          /// 文字列検索でフィルタされた一覧を表示する
-          ///
-          Flexible(child:
-            FutureBuilder<List<Brand>> (
-              future: fetchBrands(),
-              builder: (BuildContext context, AsyncSnapshot<List<Brand>> snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else {
-                  allBrands = snapshot.data!;
-                  return ListView.builder(
-                    itemBuilder: (BuildContext context, int index) {
-                      return _candidateItem(searchBrands[index]);
-                    },
-                    itemCount: searchBrands.length,
-                  );
-                }
-              },
+            ///
+            /// 日本酒銘柄一覧表示リスト
+            /// 文字列検索でフィルタされた一覧を表示する
+            ///
+            Flexible(child:
+              FutureBuilder<List<Brand>> (
+                future: fetchBrands(),
+                builder: (BuildContext context, AsyncSnapshot<List<Brand>> snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else {
+                    allBrands = snapshot.data!;
+                    return ListView.builder(
+                      itemBuilder: (BuildContext context, int index) {
+                        return _candidateItem(searchBrands[index]);
+                      },
+                      itemCount: searchBrands.length,
+                    );
+                  }
+                },
+              ),
             ),
-          ),
-        ],
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  InkWell(
+                    child: const Text("さけのわデータ",
+                      style: TextStyle(color: Color.fromARGB(255, 0, 0, 255)),
+                    ),
+                    onTap: () async {
+                      if (await canLaunch("https://sakenowa.com")) {
+                        await launch("https://sakenowa.com");
+                      }
+                    },
+                  ),
+                  const Text("を利用しています"),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
     );
   }
 
