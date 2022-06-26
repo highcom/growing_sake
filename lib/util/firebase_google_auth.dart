@@ -21,7 +21,7 @@ class FirebaseGoogleAuth extends HookConsumerWidget {
   // Firebase 認証
   final _auth = FirebaseAuth.instance;
   late UserCredential result;
-  late User user;
+  User? user;
 
   FirebaseGoogleAuth({Key? key}) : super(key: key);
 
@@ -34,7 +34,8 @@ class FirebaseGoogleAuth extends HookConsumerWidget {
       loginState = 'ログアウト中';
       loginButtonEnable = true;
     } else {
-      loginState = 'ログイン中\n' + user.displayName!;
+      String? userName = user?.displayName ?? "";
+      loginState = 'ログイン中\n' + userName;
       loginButtonEnable = false;
     }
 
@@ -78,10 +79,10 @@ class FirebaseGoogleAuth extends HookConsumerWidget {
                     // Google認証を通過した後、Firebase側にログイン　※emailが存在しなければ登録
                     try {
                       result = await _auth.signInWithCredential(credential);
-                      user = result.user!;
-                      ref.read(uidProvider.notifier).state = user.uid;
+                      user = result.user;
+                      ref.read(uidProvider.notifier).state = user!.uid;
 
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('ようこそ' + user.displayName!)));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('ようこそ' + user!.displayName!)));
                     } catch (e) {
                       print(e);
                     }
