@@ -123,7 +123,7 @@ class _CandidateListState extends State<CandidateListWidget> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Sake Detail'),
+          title: const Text('銘柄名一覧'),
           automaticallyImplyLeading: true,
         ),
         body: Column(
