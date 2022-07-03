@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:growing_sake/main.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 ///
 /// FirebaseでのGoogle認証によるログイン
@@ -28,14 +29,21 @@ class FirebaseGoogleAuth extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final uid = ref.watch(uidProvider);
+    user = _auth.currentUser;
+
+    String? userImage;
+    String? userName;
     String loginState;
     bool loginButtonEnable;
     if (uid.compareTo("") == 0) {
+      userImage = "";
+      userName = "";
       loginState = 'ログアウト中';
       loginButtonEnable = true;
     } else {
-      String? userName = user?.displayName ?? "";
-      loginState = 'ログイン中\n' + userName;
+      userImage = user?.photoURL;
+      userName = user?.displayName;
+      loginState = 'ログイン中';
       loginButtonEnable = false;
     }
 
@@ -44,6 +52,27 @@ class FirebaseGoogleAuth extends HookConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
+
+            ///
+            /// ログイン状態の場合はアイコンも表示する
+            ///
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  fit: BoxFit.fill,
+                  image: NetworkImage(userImage ?? ""),
+                )
+              ),
+            ),
+
+
+            ///
+            /// ログイン状態の場合はユーザー名も表示する
+            ///
+            Text(userName ?? ""),
 
             ///
             /// ログイン状態かどうかを明示しておく
@@ -92,6 +121,7 @@ class FirebaseGoogleAuth extends HookConsumerWidget {
 
             ///
             /// Google認証によるログアウト処理ボタン
+            ///
             ButtonTheme(
               minWidth: 350.0,
               // height: 100.0,
@@ -111,6 +141,28 @@ class FirebaseGoogleAuth extends HookConsumerWidget {
                     ref.read(uidProvider.notifier).state = "";
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('ログアウトしました')));
                   }
+              ),
+            ),
+
+            ///
+            /// プライバシーポリシーへのリンク
+            ///
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  InkWell(
+                    child: const Text("プライバシーポリシー",
+                      style: TextStyle(color: Color.fromARGB(255, 0, 0, 255)),
+                    ),
+                    onTap: () async {
+                      if (await canLaunch("https://high-commu.amebaownd.com/pages/2891722/page_201905200001")) {
+                        await launch("https://high-commu.amebaownd.com/pages/2891722/page_201905200001");
+                      }
+                    },
+                  ),
+                ],
               ),
             ),
           ],

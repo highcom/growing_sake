@@ -13,7 +13,7 @@ class SakeHomeViewWidget extends HookConsumerWidget {
   final Color color;
   final String title;
 
-  SakeHomeViewWidget({Key? key, required this.color, required this.title}) : super(key: key);
+  const SakeHomeViewWidget({Key? key, required this.color, required this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
