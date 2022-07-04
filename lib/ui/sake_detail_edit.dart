@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -80,6 +81,8 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
 
   // ユーザーID
   late String uid;
+  // ユーザー画像
+  late String userImage;
   // 日本酒のドキュメントID
   String? docId;
   // 初回データ取得か？
@@ -115,6 +118,7 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
 
   @override
   void initState() {
+    userImage = FirebaseAuth.instance.currentUser?.photoURL ?? "";
     final UidDocIdArgs uidDocIdArgs = widget.arguments as UidDocIdArgs;
     uid = uidDocIdArgs.uid;
     docId = uidDocIdArgs.docId;
@@ -379,6 +383,7 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
                   await timelineDocRef.set({
                     'uid': wuid,
                     'orgDocId': docRef.id,
+                    'userImage': userImage,
                     'createAt': createAtTimestamp,
                     'title': _title.text,
                     'subtitle': _subtitle.text,

@@ -115,8 +115,16 @@ class SakeTimelineViewWidget extends StatelessWidget {
                                           ),
                                         ),
                                       ),
-                                      Image.asset('images/sakura.png', height: 36, width: 36,),
-                                  ],),
+                                      Container(
+                                        margin: const EdgeInsets.all(4),
+                                        child: CircleAvatar(
+                                          radius: 20,
+                                          backgroundColor: Colors.transparent,
+                                          backgroundImage: NetworkImage(snapshot.data!.docs[index].get('userImage') ?? ""),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                   Container(
                                     margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
                                     child: Text(getSnapshotValue(snapshot.data!.docs[index], 'subtitle'),
