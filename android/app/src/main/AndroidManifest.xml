@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.highcom.growing_sake">
+   <uses-permission android:name="android.permission.INTERNET"/>
    <application
         android:label="growing_sake"
         android:icon="@mipmap/ic_launcher">
@@ -37,5 +38,8 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-    </application>
+       <meta-data
+           android:name="com.google.android.gms.ads.APPLICATION_ID"
+           android:value="ca-app-pub-3217012767112748~5808833406"/>
+   </application>
 </manifest>

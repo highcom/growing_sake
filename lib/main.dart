@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:growing_sake/model/uid_docid_args.dart';
 import 'package:growing_sake/util/app_theme_color.dart';
+import 'package:growing_sake/component/ad_banner.dart';
 import 'package:growing_sake/component/candidate_list.dart';
 import 'package:growing_sake/ui/sake_detail_reference.dart';
 import 'package:growing_sake/ui/sake_detail_edit.dart';
@@ -10,9 +11,11 @@ import 'package:growing_sake/ui/sake_home_view.dart';
 import 'package:growing_sake/ui/sake_timeline_view.dart';
 import 'package:growing_sake/util/firebase_google_auth.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   await Firebase.initializeApp();
   runApp(const ProviderScope(child: GrowingSakeApp()));
 }
@@ -102,16 +105,51 @@ class _GrowingSakeWidgetState extends ConsumerState<GrowingSakeWidget> {
       ),
       body: _pageWidgets.elementAt(_currentIndex),
       // 画面下部のナビゲーションバーを定義
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.timeline), label: 'Timeline'),
-          BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Menu'),
-        ],
-        currentIndex: _currentIndex,
-        fixedColor: AppThemeColor.baseColor,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
+      bottomNavigationBar: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FutureBuilder(
+              future: AdSize.getAnchoredAdaptiveBannerAdSize(Orientation.portrait,
+                  MediaQuery.of(context).size.width.truncate()),
+              builder: (
+                  BuildContext context,
+                  AsyncSnapshot<AnchoredAdaptiveBannerAdSize?> snapshot,
+                  ) {
+                if (snapshot.hasData) {
+                  final data = snapshot.data;
+                  if (data != null) {
+                    return Container(
+                      height: 70,
+                      color: Colors.white70,
+                      child: AdBanner(size: data),
+                    );
+                  } else {
+                    return Container(
+                      height: 70,
+                      color: Colors.white70,
+                    );
+                  }
+                } else {
+                  return Container(
+                    height: 70,
+                    color: Colors.white70,
+                  );
+                }
+              },
+            ),
+            BottomNavigationBar(
+              items: const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+                BottomNavigationBarItem(icon: Icon(Icons.timeline), label: 'Timeline'),
+                BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Menu'),
+              ],
+              currentIndex: _currentIndex,
+              fixedColor: AppThemeColor.baseColor,
+              onTap: _onItemTapped,
+              type: BottomNavigationBarType.fixed,
+            ),
+          ],
       ),
       floatingActionButton:
         Visibility(
