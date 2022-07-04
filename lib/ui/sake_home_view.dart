@@ -39,7 +39,7 @@ class SakeHomeViewWidget extends HookConsumerWidget {
                 crossAxisCount: 3,
                 crossAxisSpacing: 5.0, // 縦
                 mainAxisSpacing: 5.0, // 横
-                childAspectRatio: 0.7),
+                childAspectRatio: 0.75),
             itemCount: snapshot.data!.docs.length,
             padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
             itemBuilder: (BuildContext context, int index) {
@@ -93,11 +93,12 @@ class SakeHomeViewWidget extends HookConsumerWidget {
                         child: Row(
                           children: [
                             Image.asset('images/sakura.png', height: 24, width: 24,),
-                            Text(
-                              snapshot.data!.docs[index]['title'],
-                              style: const TextStyle(fontSize: 18),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,),
+                            Flexible(child: Text(
+                                snapshot.data!.docs[index]['title'],
+                                style: const TextStyle(fontSize: 18),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ],
                         ),
                       ),

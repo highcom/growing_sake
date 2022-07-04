@@ -104,14 +104,15 @@ class SakeTimelineViewWidget extends StatelessWidget {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: <Widget>[
-                                      Container(
-                                        margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                        child: Text(getSnapshotValue(snapshot.data!.docs[index], 'title'),
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 26,
-                                            color: Theme.of(context).primaryColor,
+                                      Flexible(child: Container(
+                                          margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                                          child: Text(getSnapshotValue(snapshot.data!.docs[index], 'title'),
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 26,
+                                              color: Theme.of(context).primaryColor,
+                                            ),
                                           ),
                                         ),
                                       ),
