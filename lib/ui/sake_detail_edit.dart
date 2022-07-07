@@ -514,17 +514,12 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
                   padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
                   alignment: Alignment.centerLeft,
                   child: ButtonTheme(
-                    child: OutlineButton.icon(
-                      color: AppThemeColor.baseColor,
+                    child: OutlinedButton.icon(
                       icon: Icon(_iconData,
                         color: AppThemeColor.baseColor,
                       ),
                       label: const Text('詳細表示',
                         style: TextStyle(color: AppThemeColor.baseColor),
-                      ),
-                      shape: const OutlineInputBorder(
-                        borderSide: BorderSide(color: AppThemeColor.baseColor),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
                       onPressed: _handleVisible,
                     ),

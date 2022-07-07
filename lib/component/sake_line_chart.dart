@@ -242,17 +242,12 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
             alignment: Alignment.centerLeft,
             height: widget.editEnable ? null : 0,
             child: ButtonTheme(
-              child: OutlineButton.icon(
-                color: AppThemeColor.baseColor,
+              child: OutlinedButton.icon(
                 icon: Icon(_iconData,
                   color: AppThemeColor.baseColor,
                 ),
                 label: const Text('データ入力',
                   style: TextStyle(color: AppThemeColor.baseColor),
-                ),
-                shape: const OutlineInputBorder(
-                  borderSide: BorderSide(color: AppThemeColor.baseColor),
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
                 onPressed: _handleVisible,
               ),
