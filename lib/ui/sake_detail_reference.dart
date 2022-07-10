@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:growing_sake/main.dart';
@@ -41,25 +43,29 @@ class _SakeDetailReferenceWidgetState extends ConsumerState<SakeDetailReferenceW
   // 編集画面への遷移
   late bool editEnable;
 
+  // 画像オブジェクト参照用ID
+  String _imageUid = "";
+  String _imageDocId = "";
   // 画像オブジェクト
-  late Widget _imageObject;
+  late Widget _imageObject1;
+  late Widget _imageObject2;
 
   // 香グラフ用のラインチャート
   late SakeLineChart _sakeLineChart;
   // 五味グラフ用のレーダーチャート
   late SakeRadarChart _sakeRadarChart;
 
-  String  _title = "";
-  String  _subtitle = "";
-  String  _brewery = "";
-  String  _area = "";
-  String  _specific = "";
-  String  _polishing = "";
-  String  _material = "";
-  String  _capacity = "";
-  String  _purchase = "";
-  String  _temperature = "";
-  String  _drinking = "";
+  String _title = "";
+  String _subtitle = "";
+  String _brewery = "";
+  String _area = "";
+  String _specific = "";
+  String _polishing = "";
+  String _material = "";
+  String _capacity = "";
+  String _purchase = "";
+  String _temperature = "";
+  String _drinking = "";
 
   @override
   void initState() {
@@ -88,8 +94,16 @@ class _SakeDetailReferenceWidgetState extends ConsumerState<SakeDetailReferenceW
     // スナップショットから各種パラメータを取得
     DocumentSnapshot snapshot = await future;
     if (firstTime == true) {
-      _imageObject = getImageObject();
       Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+      if (uid == 'Timeline') {
+        _imageUid = data['uid'];
+        _imageDocId = data['orgDocId'];
+      } else {
+        _imageUid = uid;
+        _imageDocId = docId;
+      }
+      _imageObject1 = getImageObject('_1');
+      _imageObject2 = getImageObject('_2');
       _title = data['title'] as String;
       _subtitle = data['subtitle'] as String;
       _brewery = data['brewery'] as String;
@@ -145,7 +159,8 @@ class _SakeDetailReferenceWidgetState extends ConsumerState<SakeDetailReferenceW
   void updateWidget() {
     setState(() {
       firstTime = true;
-      _imageObject = getImageObject();
+      _imageObject1 = getImageObject('_1');
+      _imageObject2 = getImageObject('_2');
       getBrandData();
     });
   }
@@ -153,18 +168,24 @@ class _SakeDetailReferenceWidgetState extends ConsumerState<SakeDetailReferenceW
   ///
   /// FirebaseStorageから指定されたIDの画像を取得する
   ///
-  Widget getImageObject() {
-    return FutureBuilder<String?>(
-      future: FirebaseStorageAccess.downloadFile(uid + '/' + docId + '.JPG'),
-      builder: (context, imageSnapshot) => imageSnapshot.hasData ?
-      // FirebaseStorageに画像があれば表示
-      InkWell(
-        child: Image.network(
-          imageSnapshot.data as String,
-          fit: BoxFit.cover,
+  Widget getImageObject(String num) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      child: SizedBox(
+        width: 300,
+        child :FutureBuilder<String?>(
+          future: FirebaseStorageAccess.downloadFile(_imageUid + '/' + _imageDocId + num + '.JPG'),
+          builder: (context, imageSnapshot) => imageSnapshot.hasData ?
+          // FirebaseStorageに画像があれば表示
+          InkWell(
+            child: Image.network(
+              imageSnapshot.data as String,
+              fit: BoxFit.cover,
+            ),
+            // 選択画像が無ければアイコン画像を表示
+          ) : Image.asset('images/ic_sake.png', fit: BoxFit.cover,),
         ),
-        // 選択画像が無ければアイコン画像を表示
-      ) : Image.asset('images/ic_sake.png', fit: BoxFit.cover,),
+      ),
     );
   }
 
@@ -247,10 +268,13 @@ class _SakeDetailReferenceWidgetState extends ConsumerState<SakeDetailReferenceW
                 ///
                 /// 日本酒の写真設定
                 ///
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  child: GestureDetector(
-                    child: _imageObject,
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _imageObject1,
+                      _imageObject2,
+                    ],
                   ),
                 ),
                 ///

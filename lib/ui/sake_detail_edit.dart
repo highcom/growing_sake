@@ -89,7 +89,8 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
   bool firstTime = false;
 
   // 選択画像ファイルオブジェクト
-  File? encodeFile;
+  File? encodeFile1;
+  File? encodeFile2;
 
   // 詳細内容の表示非表示設定
   bool showPicker = false;
@@ -157,10 +158,53 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
   }
 
   ///
+  /// 日本酒画像設定
+  ///
+  Widget _setSakeImage(String num) {
+    File? encodeFile;
+    if (num == "_1") {
+      encodeFile = encodeFile1;
+    } else {
+      encodeFile = encodeFile2;
+    }
+    return SizedBox(
+      width: 300,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        child: GestureDetector(
+          onTap: () => _storageUpload(num),
+          child: FutureBuilder<String?>(
+            future: FirebaseStorageAccess.downloadFile(uid + '/' + docId! + num + '.JPG'),
+            builder: (context, imageSnapshot) => (encodeFile == null && imageSnapshot.hasData) ?
+            // FirebaseStorageに画像があれば表示
+            InkWell(
+              child: Image.network(
+                imageSnapshot.data as String,
+                fit: BoxFit.cover,
+              ),
+            ) : encodeFile != null ?
+            // 選択された画像があれば表示
+            Column(
+              children: [
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: _imageDeleteButton(num),
+                ),
+                Image.file(encodeFile)
+              ],
+              // 選択画像が無ければアイコン画像を表示
+            ) : Image.asset('images/ic_sake_frame.png', fit: BoxFit.cover,),
+          ),
+        ),
+      ),
+    );
+  }
+
+  ///
   /// 選択画像を詳細画面に反映させる処理
   /// ImagePickerで指定された画像を詳細画面に反映する
   ///
-  Future<void> _storageUpload() async {
+  Future<void> _storageUpload(String num) async {
     final xfile = await ImagePicker().pickImage(source: ImageSource.gallery);
     final file = File(xfile!.path);
     final bytes = await file.readAsBytes();
@@ -168,7 +212,11 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
     img.Image croppedImage = img.copyResizeCropSquare(src, 512);
     final encFile = await File(file.path).writeAsBytes(img.encodeJpg(croppedImage));
     setState(() {
-      encodeFile = encFile;
+      if (num == "_1") {
+        encodeFile1 = encFile;
+      } else {
+        encodeFile2 = encFile;
+      }
     });
   }
 
@@ -266,7 +314,7 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
   /// 選択画像削除ボタン
   /// FirebaseStorageにアップロードする前の選択画像を削除する
   ///
-  Widget _imageDeleteButton() {
+  Widget _imageDeleteButton(String num) {
     return RaisedButton(
       child: const Icon(Icons.cancel_outlined),
       color: Colors.white,
@@ -279,7 +327,11 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
       ),
       onPressed: () {
         setState(() {
-          encodeFile = null;
+          if (num == "_1") {
+            encodeFile1 = null;
+          } else {
+            encodeFile2 = null;
+          }
         });
       },
     );
@@ -402,8 +454,29 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
                   });
 
                   // 選択された画像ファイルをFirebaseStorageへアップロードする
-                  if (encodeFile != null) {
-                    firebase_storage.UploadTask? uploadTask = await FirebaseStorageAccess.uploadFile(wuid, docRef.id, XFile(encodeFile!.path));
+                  if (encodeFile1 != null) {
+                    // 1枚目があればアップロード
+                    firebase_storage.UploadTask? uploadTask = await FirebaseStorageAccess.uploadFile(wuid, docRef.id + "_1", XFile(encodeFile1!.path));
+                    uploadTask!.whenComplete(() async {
+                      // 2枚目があればアップロード
+                      if (encodeFile2 != null) {
+                        firebase_storage.UploadTask? uploadTask = await FirebaseStorageAccess.uploadFile(wuid, docRef.id + "_2", XFile(encodeFile2!.path));
+                        uploadTask!.whenComplete(() {
+                          // データが更新されたことを通知するために値を更新
+                          ref.read(updateDetailProvider.notifier).state++;
+                          // 詳細画面を終了する
+                          Navigator.of(context).pop();
+                        });
+                      } else {
+                        // データが更新されたことを通知するために値を更新
+                        ref.read(updateDetailProvider.notifier).state++;
+                        // 詳細画面を終了する
+                        Navigator.of(context).pop();
+                      }
+                    });
+                  } else if (encodeFile2 != null) {
+                    // 2枚目のみの場合はここでアップロード
+                    firebase_storage.UploadTask? uploadTask = await FirebaseStorageAccess.uploadFile(wuid, docRef.id + "_2", XFile(encodeFile2!.path));
                     uploadTask!.whenComplete(() {
                       // データが更新されたことを通知するために値を更新
                       ref.read(updateDetailProvider.notifier).state++;
@@ -413,11 +486,9 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
                   } else {
                     // データが更新されたことを通知するために値を更新
                     ref.read(updateDetailProvider.notifier).state++;
-
                     // 詳細画面を終了する
                     Navigator.of(context).pop();
                   }
-
                 },
               ),
             ],
@@ -479,32 +550,15 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
                 ///
                 /// 日本酒の写真設定
                 ///
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  child: GestureDetector(
-                    onTap: () => _storageUpload(),
-                    child: FutureBuilder<String?>(
-                      future: FirebaseStorageAccess.downloadFile(uid + '/' + docId! + '.JPG'),
-                      builder: (context, imageSnapshot) => (encodeFile == null && imageSnapshot.hasData) ?
-                      // FirebaseStorageに画像があれば表示
-                      InkWell(
-                        child: Image.network(
-                          imageSnapshot.data as String,
-                          fit: BoxFit.cover,
-                        ),
-                      ) : encodeFile != null ?
-                      // 選択された画像があれば表示
-                      Column(
-                        children: [
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: _imageDeleteButton(),
-                          ),
-                          Image.file(encodeFile!)
-                        ],
-                        // 選択画像が無ければアイコン画像を表示
-                      ) : Image.asset('images/ic_sake.png', fit: BoxFit.cover,),
-                    ),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      // 1枚目
+                      _setSakeImage("_1"),
+                      // 2枚目
+                      _setSakeImage("_2"),
+                    ],
                   ),
                 ),
                 ///

@@ -83,6 +83,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
      - images/ic_sake.png
+     - images/ic_sake_frame.png
      - images/sakura.png
 
   # An image asset can refer to one or more resolution-specific "variants", see

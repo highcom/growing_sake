@@ -67,7 +67,7 @@ class SakeHomeViewWidget extends HookConsumerWidget {
                             FlatButton(
                               child: Text("OK"),
                               onPressed: () async {
-                                FirebaseStorageAccess.deleteFile(uid + '/' + snapshot.data!.docs[index].id + '.JPG');
+                                FirebaseStorageAccess.deleteFile(uid + '/' + snapshot.data!.docs[index].id + '_1.JPG');
                                 await snapshot.data!.docs[index].reference.delete();
                                 Navigator.pop(context);
                               },
@@ -80,7 +80,7 @@ class SakeHomeViewWidget extends HookConsumerWidget {
                   child: Column(
                     children: <Widget>[
                       FutureBuilder<String?>(
-                        future: FirebaseStorageAccess.downloadFile(uid + '/' + snapshot.data!.docs[index].id + '.JPG'),
+                        future: FirebaseStorageAccess.downloadFile(uid + '/' + snapshot.data!.docs[index].id + '_1.JPG'),
                         builder: (context, imageSnapshot) => imageSnapshot.hasData ? InkWell(
                           child: Image.network(
                             imageSnapshot.data as String,
