@@ -72,9 +72,8 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
     '飛び切り燗(55℃)',
   ];
 
-  // TODO:ある程度Timelineが実装できたらサイズを100にする
   // タイムラインMAX登録数
-  final int timeline_max = 10;
+  final int timeline_max = 100;
 
   // FirebaseStorageへのアップロードタスクオブジェクト
   firebase_storage.UploadTask? uploadTask;
