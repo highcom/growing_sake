@@ -12,6 +12,7 @@ import 'package:growing_sake/ui/sake_timeline_view.dart';
 import 'package:growing_sake/util/firebase_google_auth.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,6 +53,14 @@ class GrowingSakeApp extends StatelessWidget {
         return MaterialPageRoute(builder: (ctx) => builder(ctx));
       },
       home: const GrowingSakeWidget(title: 'Growing Sake App'),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale("en"),
+        Locale("ja"),
+      ],
     );
   }
 }

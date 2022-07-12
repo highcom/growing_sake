@@ -308,6 +308,7 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2050),
+      locale: const Locale('ja'),
     );
     if (selected != null) {
       setState(() {
