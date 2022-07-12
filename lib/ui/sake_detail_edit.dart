@@ -102,6 +102,8 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
   // 五味グラフ用のレーダーチャート
   late SakeRadarChart _sakeRadarChart;
 
+  // データ作成日時
+  late Timestamp _createAt;
   // 日本酒の詳細内容に対する各種項目
   late DateTime _purchaseDateTime;
   final TextEditingController _title = TextEditingController();
@@ -244,6 +246,12 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
     DocumentSnapshot snapshot = await future;
     if (firstTime == true) {
       Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+      // 既に作成されているデータの編集の場合には新規作成時の日付とする
+      if (data.containsKey('createAt')) {
+        _createAt = data['createAt'];
+      } else {
+        _createAt = Timestamp.fromDate(DateTime.now());
+      }
       _title.text = data['title'] as String;
       _subtitle.text = data['subtitle'] as String;
       _brewery.text = data['brewery'] as String;
@@ -252,7 +260,7 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
       _polishing.text = data['polishing'].toString();
       _material.text = data['material'] as String;
       _capacity.text = data['capacity'].toString();
-      if (docId != null) {
+      if (data.containsKey('purchase')) {
         _purchaseDateTime = data['purchase'].toDate();
       } else {
         _purchaseDateTime = DateTime.now();
@@ -396,6 +404,7 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
                   /// 各入力項目の内容をFirestoreに反映する
                   ///
                   await docRef.set({
+                        'createAt': _createAt,
                         'title': _title.text,
                         'subtitle': _subtitle.text,
                         'brewery': _brewery.text,
@@ -413,17 +422,19 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
                   });
 
                   ///
-                  /// タイムラインに既に10レコード以上ある場合には、古い方から10レコード未満まで削除する
+                  /// タイムラインに既にtimeline_maxレコード以上ある場合には、古い方からtimeline_maxレコード未満まで削除する
                   ///
                   QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('Timeline').orderBy('createAt', descending: true).get();
-                  if (snapshot.docs.length >= timeline_max) {
-                    int count = 1;
-                    for (var doc in snapshot.docs) {
-                      if (count >= timeline_max) {
-                        doc.reference.delete();
-                      }
-                      count++;
+                  int count = 1;
+                  for (var doc in snapshot.docs) {
+                    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+                    // 既存データの更新の場合には古いデータを削除する
+                    if (data['uid'] == wuid && data['orgDocId'] == docRef.id) {
+                      doc.reference.delete();
+                    } else if (count >= timeline_max) {
+                      doc.reference.delete();
                     }
+                    count++;
                   }
 
                   ///

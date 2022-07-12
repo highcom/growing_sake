@@ -21,7 +21,7 @@ class SakeHomeViewWidget extends HookConsumerWidget {
     final String uid = ref.watch(uidProvider);
     return Scaffold(
       body: uid == "" ? const Center(child: Text("メニューからログインして下さい")) : StreamBuilder(
-        stream: FirebaseFirestore.instance.collection(uid).snapshots(),
+        stream: FirebaseFirestore.instance.collection(uid).orderBy('createAt', descending: true).snapshots(),
         builder: (BuildContext context,
           // データ取得中は処理中のプログレスを表示
           AsyncSnapshot<QuerySnapshot> snapshot) {
