@@ -207,7 +207,8 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
   ///
   Future<void> _storageUpload(String num) async {
     final xfile = await ImagePicker().pickImage(source: ImageSource.gallery);
-    final file = File(xfile!.path);
+    if (xfile == null) return;
+    final file = File(xfile.path);
     final bytes = await file.readAsBytes();
     img.Image src = img.decodeImage(bytes)!;
     img.Image croppedImage = img.copyResizeCropSquare(src, 512);
