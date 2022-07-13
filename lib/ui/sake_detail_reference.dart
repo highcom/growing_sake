@@ -304,7 +304,7 @@ class _SakeDetailReferenceWidgetState extends ConsumerState<SakeDetailReferenceW
                   child: Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
                         child: _sakeRadarChart,
                       ),
                       ///
@@ -350,7 +350,7 @@ class _SakeDetailReferenceWidgetState extends ConsumerState<SakeDetailReferenceW
                 /// 香りグラフのラインチャート設定
                 ///
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
                   child: _sakeLineChart,
                 )
               ],
@@ -362,24 +362,27 @@ class _SakeDetailReferenceWidgetState extends ConsumerState<SakeDetailReferenceW
   }
 
   Widget titleContentContainer(String title, String content) {
-    return Container(
-      color: const Color(0xfff0f0f0),
-      padding: const EdgeInsets.fromLTRB(8, 16, 8, 16),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 1,
-            child: Text(title,
-              style: const TextStyle(fontSize: 16),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+      child: Container(
+        color: const Color(0xfff0f0f0),
+        padding: const EdgeInsets.fromLTRB(8, 16, 8, 16),
+        child: Row(
+          children: [
+            Expanded(
+              flex: 1,
+              child: Text(title,
+                style: const TextStyle(fontSize: 16),
+              ),
             ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(content,
-              style: const TextStyle(fontSize: 16),
+            Expanded(
+              flex: 2,
+              child: Text(content,
+                style: const TextStyle(fontSize: 16),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

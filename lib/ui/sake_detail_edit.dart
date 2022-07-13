@@ -600,7 +600,7 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
                   child: Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
                         child: _sakeRadarChart,
                       ),
                       ///
