@@ -12,13 +12,19 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class SakeHomeViewWidget extends HookConsumerWidget {
   final Color color;
   final String title;
+  int prevUpdateCount = 0;
 
-  const SakeHomeViewWidget({Key? key, required this.color, required this.title}) : super(key: key);
+  SakeHomeViewWidget({Key? key, required this.color, required this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
 
     final String uid = ref.watch(uidProvider);
+    // 新規作成や詳細画面で更新があった場合を監視するために更新カウンタを確認する
+    final int updateCount = ref.watch(updateDetailProvider);
+    if (prevUpdateCount != updateCount) {
+      prevUpdateCount = updateCount;
+    }
     return Scaffold(
       body: uid == "" ? const Center(child: Text("メニューからログインして下さい")) : StreamBuilder(
         stream: FirebaseFirestore.instance.collection(uid).orderBy('createAt', descending: true).snapshots(),
