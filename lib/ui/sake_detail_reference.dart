@@ -223,7 +223,7 @@ class _SakeDetailReferenceWidgetState extends ConsumerState<SakeDetailReferenceW
                   icon: const Icon(Icons.edit),
                   onPressed: () {
                     // 編集画面に遷移する
-                    Navigator.of(context).pushNamed('/sake_detail_edit', arguments: UidDocIdArgs(uid, docId, false));
+                    Navigator.of(context).pushReplacementNamed('/sake_detail_edit', arguments: UidDocIdArgs(uid, docId, false));
                   },
                 ),
               ),

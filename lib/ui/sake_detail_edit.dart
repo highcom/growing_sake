@@ -346,6 +346,16 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
     );
   }
 
+  ///
+  /// 編集画面終了
+  ///
+  void finish(BuildContext context) {
+    // データが更新されたことを通知するために値を更新
+    ref.read(updateDetailProvider.notifier).state++;
+    // 編集画面を終了する
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<DocumentSnapshot>(
@@ -474,32 +484,20 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
                       if (encodeFile2 != null) {
                         firebase_storage.UploadTask? uploadTask = await FirebaseStorageAccess.uploadFile(wuid, docRef.id + "_2", XFile(encodeFile2!.path));
                         uploadTask!.whenComplete(() {
-                          // データが更新されたことを通知するために値を更新
-                          ref.read(updateDetailProvider.notifier).state++;
-                          // 詳細画面を終了する
-                          Navigator.of(context).pop();
+                          finish(context);
                         });
                       } else {
-                        // データが更新されたことを通知するために値を更新
-                        ref.read(updateDetailProvider.notifier).state++;
-                        // 詳細画面を終了する
-                        Navigator.of(context).pop();
+                        finish(context);
                       }
                     });
                   } else if (encodeFile2 != null) {
                     // 2枚目のみの場合はここでアップロード
                     firebase_storage.UploadTask? uploadTask = await FirebaseStorageAccess.uploadFile(wuid, docRef.id + "_2", XFile(encodeFile2!.path));
                     uploadTask!.whenComplete(() {
-                      // データが更新されたことを通知するために値を更新
-                      ref.read(updateDetailProvider.notifier).state++;
-                      // 詳細画面を終了する
-                      Navigator.of(context).pop();
+                      finish(context);
                     });
                   } else {
-                    // データが更新されたことを通知するために値を更新
-                    ref.read(updateDetailProvider.notifier).state++;
-                    // 詳細画面を終了する
-                    Navigator.of(context).pop();
+                    finish(context);
                   }
                 },
               ),
