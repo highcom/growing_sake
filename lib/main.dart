@@ -55,6 +55,7 @@ class GrowingSakeApp extends StatelessWidget {
       home: const GrowingSakeWidget(title: 'Growing Sake App'),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
       supportedLocales: const [
