@@ -63,17 +63,18 @@ class SakeHomeViewWidget extends HookConsumerWidget {
                       builder: (_) {
                         return AlertDialog(
                           title: Text(snapshot.data!.docs[index]['title']),
-                          content: Text("削除しますか？"),
+                          content: const Text("削除しますか？"),
                           actions: <Widget>[
                             // ボタン領域
                             FlatButton(
-                              child: Text("Cancel"),
+                              child: const Text("Cancel"),
                               onPressed: () => Navigator.pop(context),
                             ),
                             FlatButton(
-                              child: Text("OK"),
+                              child: const Text("OK"),
                               onPressed: () async {
                                 FirebaseStorageAccess.deleteFile(uid + '/' + snapshot.data!.docs[index].id + '_1.JPG');
+                                FirebaseStorageAccess.deleteFile(uid + '/' + snapshot.data!.docs[index].id + '_2.JPG');
                                 await snapshot.data!.docs[index].reference.delete();
                                 Navigator.pop(context);
                               },
