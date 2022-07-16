@@ -63,7 +63,7 @@ class SakeTimelineViewWidget extends StatelessWidget {
                   crossAxisCount: 1,
                   crossAxisSpacing: 5.0, // 縦
                   mainAxisSpacing: 5.0, // 横
-                  childAspectRatio: 2.2),
+                  childAspectRatio: 2.15),
               itemCount: snapshot.data!.docs.length,
               padding: const EdgeInsets.all(5.0),
               itemBuilder: (BuildContext context, int index) {
