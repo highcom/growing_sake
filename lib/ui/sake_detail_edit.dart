@@ -175,7 +175,7 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
         child: GestureDetector(
           onTap: () => _storageUpload(num),
           child: FutureBuilder<String?>(
-            future: FirebaseStorageAccess.downloadFile(uid + '/' + docId! + num + '.JPG'),
+            future: FirebaseStorageAccess.downloadFile('UserData/' + uid + '/' + docId! + num + '.JPG'),
             builder: (context, imageSnapshot) => (encodeFile == null && imageSnapshot.hasData) ?
             // FirebaseStorageに画像があれば表示
             InkWell(
@@ -392,9 +392,10 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
                   }
                   // docIdがあれば上書き更新する
                   if (docId!.compareTo('defaultDoc') != 0) {
-                    docRef = FirebaseFirestore.instance.collection(wuid).doc(docId);
+                    // docRef = FirebaseFirestore.instance.collection(wuid).doc(docId);
+                    docRef = FirebaseFirestore.instance.collection('HomeData').doc('UserList').collection(wuid).doc(docId);
                   } else {
-                    docRef = FirebaseFirestore.instance.collection(wuid).doc();
+                    docRef = FirebaseFirestore.instance.collection('HomeData').doc('UserList').collection(wuid).doc();
                   }
 
                   var _fiveFlavorList = <String, int>{
@@ -478,11 +479,11 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
                   // 選択された画像ファイルをFirebaseStorageへアップロードする
                   if (encodeFile1 != null) {
                     // 1枚目があればアップロード
-                    firebase_storage.UploadTask? uploadTask = await FirebaseStorageAccess.uploadFile(wuid, docRef.id + "_1", XFile(encodeFile1!.path));
+                    firebase_storage.UploadTask? uploadTask = await FirebaseStorageAccess.uploadFile('UserData/' + wuid, docRef.id + '_1', XFile(encodeFile1!.path));
                     uploadTask!.whenComplete(() async {
                       // 2枚目があればアップロード
                       if (encodeFile2 != null) {
-                        firebase_storage.UploadTask? uploadTask = await FirebaseStorageAccess.uploadFile(wuid, docRef.id + "_2", XFile(encodeFile2!.path));
+                        firebase_storage.UploadTask? uploadTask = await FirebaseStorageAccess.uploadFile('UserData/' + wuid, docRef.id + '_2', XFile(encodeFile2!.path));
                         uploadTask!.whenComplete(() {
                           finish(context);
                         });
@@ -492,7 +493,7 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
                     });
                   } else if (encodeFile2 != null) {
                     // 2枚目のみの場合はここでアップロード
-                    firebase_storage.UploadTask? uploadTask = await FirebaseStorageAccess.uploadFile(wuid, docRef.id + "_2", XFile(encodeFile2!.path));
+                    firebase_storage.UploadTask? uploadTask = await FirebaseStorageAccess.uploadFile('UserData/' + wuid, docRef.id + '_2', XFile(encodeFile2!.path));
                     uploadTask!.whenComplete(() {
                       finish(context);
                     });

@@ -27,7 +27,7 @@ class SakeHomeViewWidget extends HookConsumerWidget {
     }
     return Scaffold(
       body: uid == "" ? const Center(child: Text("メニューからログインして下さい")) : StreamBuilder(
-        stream: FirebaseFirestore.instance.collection(uid).orderBy('createAt', descending: true).snapshots(),
+        stream: FirebaseFirestore.instance.collection('HomeData').doc('UserList').collection(uid).orderBy('createAt', descending: true).snapshots(),
         builder: (BuildContext context,
           // データ取得中は処理中のプログレスを表示
           AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -73,8 +73,8 @@ class SakeHomeViewWidget extends HookConsumerWidget {
                             FlatButton(
                               child: const Text("OK"),
                               onPressed: () async {
-                                FirebaseStorageAccess.deleteFile(uid + '/' + snapshot.data!.docs[index].id + '_1.JPG');
-                                FirebaseStorageAccess.deleteFile(uid + '/' + snapshot.data!.docs[index].id + '_2.JPG');
+                                FirebaseStorageAccess.deleteFile('UserData/' + uid + '/' + snapshot.data!.docs[index].id + '_1.JPG');
+                                FirebaseStorageAccess.deleteFile('UserData/' + uid + '/' + snapshot.data!.docs[index].id + '_2.JPG');
                                 await snapshot.data!.docs[index].reference.delete();
                                 Navigator.pop(context);
                               },
@@ -87,7 +87,7 @@ class SakeHomeViewWidget extends HookConsumerWidget {
                   child: Column(
                     children: <Widget>[
                       FutureBuilder<String?>(
-                        future: FirebaseStorageAccess.downloadFile(uid + '/' + snapshot.data!.docs[index].id + '_1.JPG'),
+                        future: FirebaseStorageAccess.downloadFile('UserData/' + uid + '/' + snapshot.data!.docs[index].id + '_1.JPG'),
                         builder: (context, imageSnapshot) => imageSnapshot.hasData ? InkWell(
                           child: Image.network(
                             imageSnapshot.data as String,

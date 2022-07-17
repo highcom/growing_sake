@@ -86,7 +86,7 @@ class SakeTimelineViewWidget extends StatelessWidget {
                       child: Row(
                         children: <Widget>[
                           FutureBuilder<String?>(
-                            future: FirebaseStorageAccess.downloadFile(snapshot.data!.docs[index].get('uid') + '/' + snapshot.data!.docs[index].get('orgDocId') + '_1.JPG'),
+                            future: FirebaseStorageAccess.downloadFile('UserData/' + snapshot.data!.docs[index].get('uid') + '/' + snapshot.data!.docs[index].get('orgDocId') + '_1.JPG'),
                             builder: (context, imageSnapshot) => imageSnapshot.hasData ? InkWell(
                               child: Image.network(
                                 imageSnapshot.data as String,
