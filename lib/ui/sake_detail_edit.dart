@@ -242,7 +242,7 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
   Future<DocumentSnapshot> getBrandData() async {
     Future<DocumentSnapshot> future;
     // ドキュメントIDがあれば対応する情報を取得し、新規作成の場合はデフォルトパラメータの情報を取得する
-    future = FirebaseFirestore.instance.collection(uid).doc(docId).get();
+    future = FirebaseFirestore.instance.collection('HomeData').doc('UserList').collection(uid).doc(docId).get();
     // スナップショットから各種パラメータを取得
     DocumentSnapshot snapshot = await future;
     if (firstTime == true) {
