@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:growing_sake/main.dart';
 import 'package:growing_sake/model/uid_docid_args.dart';
 import 'package:growing_sake/util/app_theme_color.dart';
@@ -89,8 +88,12 @@ class _SakeDetailReferenceWidgetState extends ConsumerState<SakeDetailReferenceW
   ///
   Future<DocumentSnapshot> getBrandData() async {
     Future<DocumentSnapshot> future;
-    // ドキュメントIDがあれば対応する情報を取得し、新規作成の場合はデフォルトパラメータの情報を取得する
-    future = FirebaseFirestore.instance.collection('HomeData').doc('UserList').collection(uid).doc(docId).get();
+    // ドキュメントIDに対応する情報を取得する
+    if (uid == 'Timeline') {
+      future = FirebaseFirestore.instance.collection('Timeline').doc(docId).get();
+    } else {
+      future = FirebaseFirestore.instance.collection('HomeData').doc('UserList').collection(uid).doc(docId).get();
+    }
     // スナップショットから各種パラメータを取得
     DocumentSnapshot snapshot = await future;
     if (firstTime == true) {
