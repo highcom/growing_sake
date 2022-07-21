@@ -269,14 +269,23 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
       _purchase.text = (DateFormat.yMMMEd()).format(_purchaseDateTime);
       _temperature.text = data['temperature'].toString();
       _drinking.text = data['drinking'] as String;
-      if (data.containsKey('aromaElapsedList') && data.containsKey('aromaLevelList')) {
-        _sakeLineChart = SakeLineChart(
-            elapsedList: data['aromaElapsedList'].cast<double>() as List<double>,
-            levelList: data['aromaLevelList'].cast<double>() as List<double>);
+
+      // 香りデータがある場合にはデータを設定する
+      if (data.containsKey('aromaList')) {
+        List<String> _aromaList = data['aromaList'].cast<String>() as List<String>;
+        List<double> _elapsedList = [];
+        List<double> _levelList = [];
+        for (var aroma in _aromaList) {
+          List<String> _coord = aroma.split(',');
+          _elapsedList.add(double.parse(_coord[0]));
+          _levelList.add(double.parse(_coord[1]));
+        }
+        _sakeLineChart = SakeLineChart(elapsedList: _elapsedList, levelList: _levelList);
       } else {
         _sakeLineChart = SakeLineChart(elapsedList: const [], levelList: const []);
       }
 
+      // 五味データがある場合にはデータを設定する
       if (data.containsKey('fiveFlavorList')) {
         _sakeRadarChart = SakeRadarChart(title: _title.text, fiveFlavorList: data['fiveFlavorList'].cast<String, int>() as Map<String, int>);
       } else {
@@ -406,11 +415,9 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
                     'astringent': _sakeRadarChart.fiveFlavorParameter.astringent.param,
                   };
 
-                  List<double> _aromaElapsedList = [];
-                  List<double> _aromaLevelList = [];
+                  List<String> _aromaList = [];
                   for (var aroma in _sakeLineChart.aromaDataList) {
-                    _aromaElapsedList.add(aroma.x);
-                    _aromaLevelList.add(aroma.y);
+                    _aromaList.add(aroma.x.toString() + ',' + aroma.y.toString());
                   }
 
                   ///
@@ -430,8 +437,7 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
                         'temperature': _temperature.text,
                         'drinking': _drinking.text,
                         'fiveFlavorList': _fiveFlavorList,
-                        'aromaElapsedList': FieldValue.arrayUnion(_aromaElapsedList),
-                        'aromaLevelList': FieldValue.arrayUnion(_aromaLevelList),
+                        'aromaList': FieldValue.arrayUnion(_aromaList),
                   });
 
                   ///
@@ -472,8 +478,7 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
                     'temperature': _temperature.text,
                     'drinking': _drinking.text,
                     'fiveFlavorList': _fiveFlavorList,
-                    'aromaElapsedList': FieldValue.arrayUnion(_aromaElapsedList),
-                    'aromaLevelList': FieldValue.arrayUnion(_aromaLevelList),
+                    'aromaList': FieldValue.arrayUnion(_aromaList),
                   });
 
                   // 選択された画像ファイルをFirebaseStorageへアップロードする

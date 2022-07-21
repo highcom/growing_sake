@@ -120,15 +120,23 @@ class _SakeDetailReferenceWidgetState extends ConsumerState<SakeDetailReferenceW
       }
       _temperature = data['temperature'].toString();
       _drinking = data['drinking'] as String;
-      if (data.containsKey('aromaElapsedList') && data.containsKey('aromaLevelList')) {
-        _sakeLineChart = SakeLineChart(
-            elapsedList: data['aromaElapsedList'].cast<double>() as List<double>,
-            levelList: data['aromaLevelList'].cast<double>() as List<double>,
-            editEnable: false);
+
+      // 香りデータがある場合にはデータを設定する
+      if (data.containsKey('aromaList')) {
+        List<String> _aromaList = data['aromaList'].cast<String>() as List<String>;
+        List<double> _elapsedList = [];
+        List<double> _levelList = [];
+        for (var aroma in _aromaList) {
+          List<String> _coord = aroma.split(',');
+          _elapsedList.add(double.parse(_coord[0]));
+          _levelList.add(double.parse(_coord[1]));
+        }
+        _sakeLineChart = SakeLineChart(elapsedList: _elapsedList, levelList: _levelList, editEnable: false);
       } else {
         _sakeLineChart = SakeLineChart(elapsedList: const [], levelList: const [], editEnable: false);
       }
 
+      // 五味データがある場合にはデータを設定する
       if (data.containsKey('fiveFlavorList')) {
         _sakeRadarChart = SakeRadarChart(title: _title, fiveFlavorList: data['fiveFlavorList'].cast<String, int>() as Map<String, int>, editEnable: false);
       } else {

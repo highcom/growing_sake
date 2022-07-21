@@ -72,10 +72,16 @@ class SakeTimelineViewWidget extends StatelessWidget {
                   _sakeRadarChartThumb = SakeRadarChartThumb(fiveFlavorList: snapshot.data!.docs[index].get('fiveFlavorList').cast<String, int>() as Map<String, int>);
                 }
                 // 香りデータがある場合にはデータを設定する
-                if (snapshot.data!.docs[index].get('aromaElapsedList') != null && snapshot.data!.docs[index].get('aromaLevelList') != null) {
-                  _sakeLineChartThumb = SakeLineChartThumb(
-                      elapsedList: snapshot.data!.docs[index].get('aromaElapsedList').cast<double>() as List<double>,
-                      levelList: snapshot.data!.docs[index].get('aromaLevelList').cast<double>() as List<double>);
+                if (snapshot.data!.docs[index].get('aromaList') != null) {
+                  List<String> _aromaList = snapshot.data!.docs[index].get('aromaList').cast<String>() as List<String>;
+                  List<double> _elapsedList = [];
+                  List<double> _levelList = [];
+                  for (var aroma in _aromaList) {
+                    List<String> _coord = aroma.split(',');
+                    _elapsedList.add(double.parse(_coord[0]));
+                    _levelList.add(double.parse(_coord[1]));
+                  }
+                  _sakeLineChartThumb = SakeLineChartThumb(elapsedList: _elapsedList, levelList: _levelList);
                 }
 
                 return Container(
