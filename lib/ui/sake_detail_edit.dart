@@ -16,6 +16,7 @@ import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
+import 'package:heic_to_jpg/heic_to_jpg.dart';
 
 ///
 /// 日本酒に対する詳細内容の表示
@@ -207,11 +208,25 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
   ///
   Future<void> _storageUpload(String num) async {
     final xfile = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (xfile == null) return;
-    final file = File(xfile.path);
+    // 取得できないファイルを選択された場合にはエラーダイアログを出す
+    if (xfile == null) {
+      cannotSelectDialog();
+      return;
+    }
+    var file = File(xfile.path);
+    // HEICファイルの場合にはJPEGに変換する
+    if (file.path.split('.').last == 'heif') {
+      final jpegPath = await HeicToJpg.convert(file.path);
+      file = File(jpegPath ?? "");
+    }
     final bytes = await file.readAsBytes();
-    img.Image src = img.decodeImage(bytes)!;
-    img.Image croppedImage = img.copyResizeCropSquare(src, 512);
+    img.Image? src = img.decodeImage(bytes);
+    // デコードできないファイルを選択された場合にはエラーダイアログを出す
+    if (src == null) {
+      cannotSelectDialog();
+      return;
+    }
+    img.Image? croppedImage = img.copyResizeCropSquare(src, 512);
     final encFile = await File(file.path).writeAsBytes(img.encodeJpg(croppedImage));
     setState(() {
       if (num == "_1") {
@@ -220,6 +235,28 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
         encodeFile2 = encFile;
       }
     });
+  }
+
+  ///
+  /// 選択できない画像を表示した場合のエラーダイアログ
+  ///
+  void cannotSelectDialog() {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: const Text("選択画像エラー"),
+          content: const Text("選択できない画像です。"),
+          actions: <Widget>[
+            // ボタン領域
+            FlatButton(
+              child: const Text("OK"),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   ///
