@@ -307,7 +307,6 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
                     onPressed: () {
                       setState(() {
                         _currentDate = _selectDateTime.millisecondsSinceEpoch / (1000 * 60 * 60 * 24);
-                        if (_startDate == 0) _startDate = _currentDate;
                         for (var aroma in widget.aromaDataList) {
                           // 同じ日付があった場合には一度削除してから登録し直す
                           if (aroma.x == _currentDate) {
@@ -317,6 +316,7 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
                         }
                         widget.aromaDataList.add(FlSpot(_currentDate, _currentAromaLevel.toDouble()));
                         widget.aromaDataList.sort((left, right) => left.x.compareTo(right.x));
+                        _startDate = widget.aromaDataList.first.x;
                         _endDate = widget.aromaDataList.last.x;
                       });
                     },
