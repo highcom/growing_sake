@@ -84,7 +84,7 @@ class _SakeLineChartThumbState extends State<SakeLineChartThumb> with SingleTick
       lineBarsData: [
         LineChartBarData(
           spots: widget.aromaDataList,
-          isCurved: false,
+          isCurved: true,
           colors: gradientColors,
           barWidth: 3,
           isStrokeCapRound: false,

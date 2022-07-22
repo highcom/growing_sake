@@ -211,7 +211,7 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
           barWidth: 5,
           isStrokeCapRound: true,
           dotData: FlDotData(
-            show: false,
+            show: true,
           ),
           belowBarData: BarAreaData(
             show: true,
