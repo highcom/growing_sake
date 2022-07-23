@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "484437078385-u9q6c8gdbe16jrtvciip2eshqq8dcdgs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.highcom.growing_sake",
+            "certificate_hash": "7db8dfe44e8f011ec3ca91cb61270f2ff624803d"
+          }
+        },
+        {
           "client_id": "484437078385-o59es2q9ctule3hdm1e948c36dlcp009.apps.googleusercontent.com",
           "client_type": 3
         }
