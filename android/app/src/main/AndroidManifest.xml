@@ -2,7 +2,7 @@
     package="com.highcom.growing_sake">
    <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="growing_sake"
+        android:label="日本酒を育てる"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
