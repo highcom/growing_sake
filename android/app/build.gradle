@@ -50,6 +50,8 @@ android {
         targetSdkVersion 31
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+
+        archivesBaseName = "GrowingSake-${versionName}"
     }
 
     buildTypes {
@@ -65,6 +67,12 @@ android {
         disable "Instantiatable"
         checkReleaseBuilds false
         abortOnError false
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "GrowingSake-${versionName}-${variant.buildType.name}.apk"
+        }
     }
 }
 
