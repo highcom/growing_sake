@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:growing_sake/util/app_theme_color.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:growing_sake/model/brand.dart';
@@ -26,6 +25,7 @@ class CandidateListWidget extends StatefulWidget {
 class _CandidateListState extends State<CandidateListWidget> {
   final _focusNode = FocusNode();
 
+  static Future<List<Brand>>? fetchingBrands;
   // 銘柄名の初期値
   List<String> _defaultParams = [];
   // 全銘柄名のリスト
@@ -111,6 +111,8 @@ class _CandidateListState extends State<CandidateListWidget> {
         Navigator.of(context).pop(result);
       }
     });
+
+    fetchingBrands ??= fetchBrands();
   }
 
   @override
@@ -165,7 +167,7 @@ class _CandidateListState extends State<CandidateListWidget> {
             ///
             Flexible(child:
               FutureBuilder<List<Brand>> (
-                future: fetchBrands(),
+                future: fetchingBrands,
                 builder: (BuildContext context, AsyncSnapshot<List<Brand>> snapshot) {
                   if (!snapshot.hasData) {
                     return const Center(
