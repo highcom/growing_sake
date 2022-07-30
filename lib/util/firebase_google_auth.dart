@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:growing_sake/main.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:http/http.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 ///
@@ -25,6 +26,17 @@ class FirebaseGoogleAuth extends HookConsumerWidget {
   User? user;
 
   FirebaseGoogleAuth({Key? key}) : super(key: key);
+
+  ///
+  /// ユーザー画像を取得する
+  ///
+  ImageProvider getUserImage(String? userImage) {
+    if (userImage != null && userImage != "") {
+      return NetworkImage(userImage);
+    } else {
+      return const AssetImage("images/account_black.png");
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -63,8 +75,8 @@ class FirebaseGoogleAuth extends HookConsumerWidget {
                 shape: BoxShape.circle,
                 image: DecorationImage(
                   fit: BoxFit.fill,
-                  image: NetworkImage(userImage ?? ""),
-                )
+                  image: getUserImage(userImage),
+                ),
               ),
             ),
 

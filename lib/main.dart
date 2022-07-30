@@ -81,7 +81,10 @@ class GrowingSakeWidget extends StatefulHookConsumerWidget {
 ///
 class _GrowingSakeWidgetState extends ConsumerState<GrowingSakeWidget> {
   int _currentIndex = 0;
+  final _auth = FirebaseAuth.instance;
+  User? _user;
   String uid = "";
+  String? userImage;
   bool _fabVisible = false;
   final _pageWidgets = [
     SakeHomeViewWidget(color:Colors.white, title:'Home'),
@@ -98,22 +101,56 @@ class _GrowingSakeWidgetState extends ConsumerState<GrowingSakeWidget> {
   @override
   void initState() {
     // 既に認証済みの状態であればuidを保持しておく
-    final _auth = FirebaseAuth.instance;
-    User? _user = _auth.currentUser;
     if (_user != null) {
-      ref.read(uidProvider.notifier).state = _user.uid;
-      uid = _user.uid;
+      ref.read(uidProvider.notifier).state = _user?.uid ?? "";
+      uid = _user?.uid ?? "";
+      userImage = _user?.photoURL;
     }
     _setFabVisible();
     super.initState();
   }
 
+  ///
+  /// ユーザー画像を取得する
+  ///
+  ImageProvider getUserImage(String? userImage) {
+    if (userImage != null && userImage != "") {
+      return NetworkImage(userImage);
+    } else {
+      return const AssetImage("images/account_white.png");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     uid = ref.watch(uidProvider);
+    _user = _auth.currentUser;
+
+    if (uid.compareTo("") == 0) {
+      userImage = "";
+    } else {
+      userImage = _user?.photoURL;
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('日本酒を育てる'),
+        title: Row(
+          children: [
+            Container(
+              width: 30,
+              height: 30,
+              margin: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  fit: BoxFit.fill,
+                  image: getUserImage(userImage),
+                ),
+              ),
+            ),
+            const Text('日本酒を育てる'),
+          ],
+        ),
       ),
       body: _pageWidgets.elementAt(_currentIndex),
       // 画面下部のナビゲーションバーを定義

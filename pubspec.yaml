@@ -94,6 +94,8 @@ flutter:
      - images/ic_sake.png
      - images/ic_sake_frame.png
      - images/sakura.png
+     - images/account_black.png
+     - images/account_white.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
