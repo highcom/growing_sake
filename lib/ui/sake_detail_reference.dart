@@ -35,6 +35,8 @@ class _SakeDetailReferenceWidgetState extends ConsumerState<SakeDetailReferenceW
   // 詳細表示状態に応じたアイコン
   IconData _iconData = Icons.add;
 
+  // 画面サイズ
+  double? screenWidth;
   // ユーザーID
   late String uid;
   // 日本酒のドキュメントID
@@ -181,9 +183,9 @@ class _SakeDetailReferenceWidgetState extends ConsumerState<SakeDetailReferenceW
   ///
   Widget getImageObject(String num) {
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
       child: SizedBox(
-        width: 300,
+        width: screenWidth,
         child :FutureBuilder<String?>(
           future: FirebaseStorageAccess.downloadFile('UserData/' + _imageUid + '/' + _imageDocId + num + '.JPG'),
           builder: (context, imageSnapshot) => imageSnapshot.hasData ?
@@ -206,6 +208,8 @@ class _SakeDetailReferenceWidgetState extends ConsumerState<SakeDetailReferenceW
     ref.listen(updateDetailProvider, (previous, next) {
       updateWidget();
     });
+
+    screenWidth = MediaQuery.of(context).size.width;
 
     return FutureBuilder<DocumentSnapshot>(
       future: getBrandData(),

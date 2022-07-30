@@ -79,6 +79,8 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
   // FirebaseStorageへのアップロードタスクオブジェクト
   firebase_storage.UploadTask? uploadTask;
 
+  // 画面サイズ
+  double? screenWidth;
   // ユーザーID
   late String uid;
   // ユーザー画像
@@ -170,9 +172,9 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
       encodeFile = encodeFile2;
     }
     return SizedBox(
-      width: 300,
+      width: screenWidth,
       child: Container(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
         child: GestureDetector(
           onTap: () => _storageUpload(num),
           child: FutureBuilder<String?>(
@@ -408,6 +410,8 @@ class _SakeDetailEditState extends ConsumerState<SakeDetailEditWidget> with Sing
 
   @override
   Widget build(BuildContext context) {
+    screenWidth = MediaQuery.of(context).size.width;
+
     return FutureBuilder<DocumentSnapshot>(
       future: getBrandData(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
