@@ -227,9 +227,6 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        borderRadius: BorderRadius.all(
-          Radius.circular(18),
-        ),
         color: Color(0xfff0f0f0),
       ),
       child: Column(
@@ -246,7 +243,7 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
                 icon: Icon(_iconData,
                   color: AppThemeColor.baseColor,
                 ),
-                label: const Text('データ入力',
+                label: const Text('香りデータ入力',
                   style: TextStyle(color: AppThemeColor.baseColor),
                 ),
                 onPressed: _handleVisible,
@@ -333,17 +330,25 @@ class _SakeLineChartState extends State<SakeLineChart> with SingleTickerProvider
               AspectRatio(
                 aspectRatio: 1.70,
                 child: Container(
-                  decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(18),
-                      ),
-                      color: Color(0xfff0f0f0)),
+                  decoration: const BoxDecoration(color: Color(0xfff0f0f0)),
                   child: Padding(
                     padding: const EdgeInsets.only(
                         right: 18.0, left: 12.0, top: 24, bottom: 12),
                     child: LineChart(mainData()),
                   ),
                 ),
+              ),
+            ],
+          ),
+          ///
+          /// グラフタイトル
+          ///
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
+                child: const Text('香りグラフ'),
               ),
             ],
           ),

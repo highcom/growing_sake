@@ -196,7 +196,7 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
       builder: (BuildContext context) {
         return StatefulBuilder(builder: (context, setState) {
           return AlertDialog(
-            title: const Text('AlertDialog Title'),
+            title: const Text('五味データ入力'),
             content: SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[
@@ -267,20 +267,18 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ///
-        /// レーダーチャート本体
-        ///
-        Container(
-          decoration: const BoxDecoration(
-              borderRadius: BorderRadius.all(
-                Radius.circular(18),
-              ),
-              color: Color(0xfff0f0f0)),
-          child: AspectRatio(
+    return Container(
+      padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+      decoration: const BoxDecoration(color: Color(0xfff0f0f0)),
+      child:
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ///
+          /// レーダーチャート本体
+          ///
+          AspectRatio(
             aspectRatio: 1.3,
             child: RadarChart(
               RadarChartData(
@@ -350,8 +348,17 @@ class _SakeRadarChartState extends State<SakeRadarChart> {
                   milliseconds: 400),
             ),
           ),
-        ),
-      ],
+          ///
+          /// グラフタイトル
+          ///
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Text('五味グラフ'),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
