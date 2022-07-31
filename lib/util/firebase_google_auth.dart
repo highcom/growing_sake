@@ -131,7 +131,7 @@ class _FirebaseGoogleAuthState extends ConsumerState<FirebaseGoogleAuth> {
                         ButtonTheme(
                           height: 60.0,
                           child: RaisedButton(
-                            child: const Text(' Google認証ログイン ',
+                            child: const Text('Google認証\nログイン',
                               style: TextStyle(fontWeight: FontWeight.bold),),
                             textColor: Colors.white,
                             color: loginButtonEnable ? Colors.lightGreen : Colors.grey,
@@ -170,7 +170,7 @@ class _FirebaseGoogleAuthState extends ConsumerState<FirebaseGoogleAuth> {
                         ButtonTheme(
                           height: 60.0,
                           child: RaisedButton(
-                              child: const Text('Google認証ログアウト',
+                              child: const Text('Google認証\nログアウト',
                                 style: TextStyle(fontWeight: FontWeight.bold),),
                               textColor: Colors.white,
                               color: loginButtonEnable ? Colors.grey : Colors.lightGreen,
