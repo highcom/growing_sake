@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "484437078385-abv0gbusineul93cr6jdkmh8i64cg4u7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.highcom.growing_sake",
+            "certificate_hash": "27e61ca4778a301667935d319cb89f98c648ffce"
+          }
+        },
+        {
           "client_id": "484437078385-u9q6c8gdbe16jrtvciip2eshqq8dcdgs.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -37,6 +45,13 @@
             {
               "client_id": "484437078385-o59es2q9ctule3hdm1e948c36dlcp009.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "484437078385-b5g69dodecrdd3s4g25fafih76vnia60.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.highcom.growingSake"
+              }
             }
           ]
         }
@@ -82,6 +97,13 @@
             {
               "client_id": "484437078385-o59es2q9ctule3hdm1e948c36dlcp009.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "484437078385-b5g69dodecrdd3s4g25fafih76vnia60.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.highcom.growingSake"
+              }
             }
           ]
         }
