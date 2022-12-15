@@ -76,6 +76,11 @@ class SakeHomeViewWidget extends HookConsumerWidget {
                                 FirebaseStorageAccess.deleteFile('UserData/' + uid + '/' + snapshot.data!.docs[index].id + '_1.JPG');
                                 FirebaseStorageAccess.deleteFile('UserData/' + uid + '/' + snapshot.data!.docs[index].id + '_2.JPG');
                                 await snapshot.data!.docs[index].reference.delete();
+                                // タイムラインにも存在していた場合は併せて削除する
+                                QuerySnapshot timelineSnapshot = await FirebaseFirestore.instance.collection('Timeline').where("orgDocId", isEqualTo: snapshot.data!.docs[index].id).get();
+                                for (QueryDocumentSnapshot doc in timelineSnapshot.docs) {
+                                  doc.reference.delete();
+                                }
                                 Navigator.pop(context);
                               },
                             ),
