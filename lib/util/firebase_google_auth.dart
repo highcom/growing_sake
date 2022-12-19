@@ -91,6 +91,7 @@ class _FirebaseGoogleAuthState extends ConsumerState<FirebaseGoogleAuth> {
             Padding(
               padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
               child: Container(
+                width: double.infinity,
                 color: const Color(0xfff0f0f0),
                 padding: const EdgeInsets.fromLTRB(8, 16, 8, 16),
                 child: Column(
@@ -118,29 +119,18 @@ class _FirebaseGoogleAuthState extends ConsumerState<FirebaseGoogleAuth> {
                       padding: const EdgeInsets.all(8),
                       child: Text(userName == "" ? loginState : userName),
                     ),
-
                     ///
-                    /// 認証ボタンを横に並べる
+                    /// Google認証によるログイン処理ボタン
                     ///
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ///
-                        /// Google認証によるログイン処理ボタン
-                        ///
-                        ButtonTheme(
-                          height: 60.0,
-                          child: RaisedButton(
-                            child: const Text('Google認証\nログイン',
-                              style: TextStyle(fontWeight: FontWeight.bold),),
-                            textColor: Colors.white,
-                            color: loginButtonEnable ? Colors.lightGreen : Colors.grey,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-
-                            onPressed: () async {
-                              if (!loginButtonEnable) return;
+                    Material(
+                      child:Visibility(
+                        visible: loginButtonEnable,
+                        child: SizedBox(
+                          width: 230,
+                          height: 55,
+                          child: InkWell(
+                            radius: 100,
+                            onTap: () async {
                               // Google認証の部分
                               googleUser = (await _google_signin.signIn())!;
                               googleAuth = await googleUser.authentication;
@@ -160,34 +150,38 @@ class _FirebaseGoogleAuthState extends ConsumerState<FirebaseGoogleAuth> {
                               } catch (e) {
                                 print(e);
                               }
-                            }
+                            },
+                            child: Ink.image(
+                              fit: BoxFit.cover,
+                              image: const AssetImage('images/ic_google_rogo.png'),
+                            ),
                           ),
                         ),
-
-                        ///
-                        /// Google認証によるログアウト処理ボタン
-                        ///
-                        ButtonTheme(
-                          height: 60.0,
-                          child: RaisedButton(
-                              child: const Text('Google認証\nログアウト',
-                                style: TextStyle(fontWeight: FontWeight.bold),),
-                              textColor: Colors.white,
-                              color: loginButtonEnable ? Colors.grey : Colors.lightGreen,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-
-                              onPressed: () {
-                                if (loginButtonEnable) return;
-                                _auth.signOut();
-                                _google_signin.signOut();
-                                ref.read(uidProvider.notifier).state = "";
-                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('ログアウトしました')));
-                              }
+                      ),
+                    ),
+                    ///
+                    /// Google認証によるログアウト処理ボタン
+                    ///
+                    Visibility(
+                      visible: !loginButtonEnable,
+                      child: ButtonTheme(
+                        height: 55,
+                        child: OutlinedButton.icon(
+                          icon: const Icon(Icons.logout,
+                            color: Colors.grey,
                           ),
+                          label: const Text('ログアウト',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                          onPressed: () {
+                            if (loginButtonEnable) return;
+                            _auth.signOut();
+                            _google_signin.signOut();
+                            ref.read(uidProvider.notifier).state = "";
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('ログアウトしました')));
+                          }
                         ),
-                      ],
+                      ),
                     ),
                   ],
                 ),

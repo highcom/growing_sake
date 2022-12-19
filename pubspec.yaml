@@ -94,6 +94,7 @@ flutter:
   assets:
      - images/ic_sake.png
      - images/ic_sake_frame.png
+     - images/ic_google_rogo.png
      - images/sakura.png
      - images/account_black.png
      - images/account_white.png

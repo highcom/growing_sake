@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:growing_sake/main.dart';
 import 'package:growing_sake/model/uid_docid_args.dart';
 import 'package:growing_sake/util/firebase_storage_access.dart';
@@ -14,6 +16,20 @@ class SakeHomeViewWidget extends HookConsumerWidget {
   final String title;
   int prevUpdateCount = 0;
 
+  // Google 認証
+  final _google_signin  = GoogleSignIn(scopes: [
+    'email',
+    'https://www.googleapis.com/auth/contacts.readonly',
+  ]);
+  late GoogleSignInAccount googleUser;
+  late GoogleSignInAuthentication googleAuth;
+  late AuthCredential credential;
+
+  // Firebase 認証
+  final _auth = FirebaseAuth.instance;
+  late UserCredential result;
+  User? user;
+
   SakeHomeViewWidget({Key? key, required this.color, required this.title}) : super(key: key);
 
   @override
@@ -26,7 +42,50 @@ class SakeHomeViewWidget extends HookConsumerWidget {
       prevUpdateCount = updateCount;
     }
     return Scaffold(
-      body: uid == "" ? const Center(child: Text("メニューからログインして下さい")) : StreamBuilder(
+      body: uid == "" ? Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const Padding(
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 8),
+                child: Text("ログインをして始めましょう！"),
+              ),
+              SizedBox(
+                width: 230,
+                height: 55,
+                // Inkwell
+                child: InkWell(
+                  radius: 100,
+                  onTap: () async {
+                    // Google認証の部分
+                    googleUser = (await _google_signin.signIn())!;
+                    googleAuth = await googleUser.authentication;
+
+                    credential = GoogleAuthProvider.credential(
+                      accessToken: googleAuth.accessToken,
+                      idToken: googleAuth.idToken,
+                    );
+
+                    // Google認証を通過した後、Firebase側にログイン　※emailが存在しなければ登録
+                    try {
+                      result = await _auth.signInWithCredential(credential);
+                      user = result.user;
+                      ref.read(uidProvider.notifier).state = user!.uid;
+
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('ようこそ' + user!.displayName!)));
+                    } catch (e) {
+                      print(e);
+                    }
+                  },
+                  child: Ink.image(
+                    fit: BoxFit.cover,
+                    image: const AssetImage('images/ic_google_rogo.png'),
+                  ),
+                ),
+              ),
+            ],
+          ),
+      ) : StreamBuilder(
         stream: FirebaseFirestore.instance.collection('HomeData').doc('UserList').collection(uid).orderBy('createAt', descending: true).snapshots(),
         builder: (BuildContext context,
           // データ取得中は処理中のプログレスを表示
